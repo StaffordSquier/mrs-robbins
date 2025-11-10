@@ -1,5 +1,7 @@
 'use client';
 
+import Link from 'next/link';
+
 export default function Dashboard() {
   const tools = [
     {
@@ -44,7 +46,7 @@ export default function Dashboard() {
         {/* Tools Grid */}
         <div className="grid gap-6">
           {tools.map((tool) => (
-            <a
+            <Link
               key={tool.href}
               href={tool.href}
               className="block bg-white rounded-lg p-8 shadow-sm hover:shadow-md transition-shadow border border-gray-200"
@@ -60,7 +62,7 @@ export default function Dashboard() {
               <p className="text-[#4A5568] leading-relaxed">
                 {tool.description}
               </p>
-            </a>
+            </Link>
           ))}
         </div>
 
