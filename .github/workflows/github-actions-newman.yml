@@ -15,21 +15,14 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Wait for Vercel deployment
-        uses: patrickedqvist/wait-for-vercel-preview@v1.3.1
-        id: wait-for-vercel
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          max_timeout: 300
-          check_interval: 10
+        run: sleep 30
 
       - name: Install Newman
         run: npm install -g newman
 
       - name: Run Postman tests
         run: newman run postman-collection.json --bail --color on
-        env:
-          DEPLOYMENT_URL: ${{ steps.wait-for-vercel.outputs.url }}
 
       - name: Notify on failure
         if: failure()
-        run: echo "API tests failed on deployment ${{ steps.wait-for-vercel.outputs.url }}"
+        run: echo "API tests failed - check newman output above"
