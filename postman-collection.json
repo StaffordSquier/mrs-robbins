@@ -1,0 +1,166 @@
+{
+  "info": {
+    "name": "Mrs Robbins API Tests",
+    "description": "Automated API tests for Mrs Robbins platform",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "https://mrs-robbins.vercel.app",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Conversation API",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"messages\": [\n    {\n      \"role\": \"user\",\n      \"content\": \"I want to write about my experience growing up in Texas.\"\n    }\n  ],\n  \"voiceConfig\": {\n    \"formality\": 5,\n    \"complexity\": 5,\n    \"emotionality\": 5\n  }\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/conversation",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "conversation"]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test(\"Response has valid structure\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData).to.have.property('response');",
+              "    pm.expect(jsonData.response).to.be.a('string');",
+              "    pm.expect(jsonData.response.length).to.be.above(0);",
+              "});",
+              "",
+              "pm.test(\"Response time is acceptable\", function () {",
+              "    pm.expect(pm.response.responseTime).to.be.below(5000);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Evaluate Voice API",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"outputText\": \"The limestone cliffs of Bandera rise up from the valley floor, their weathered faces telling stories of geological time that dwarf human memory. I spent my childhood in their shadow.\",\n  \"variable\": \"formality\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/evaluate-voice",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "evaluate-voice"]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test(\"Score is valid\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData).to.have.property('score');",
+              "    pm.expect(jsonData.score).to.be.a('number');",
+              "    pm.expect(jsonData.score).to.be.at.least(1);",
+              "    pm.expect(jsonData.score).to.be.at.most(10);",
+              "});",
+              "",
+              "pm.test(\"Evidence exists\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData).to.have.property('evidence');",
+              "    pm.expect(jsonData.evidence).to.be.a('string');",
+              "    pm.expect(jsonData.evidence.length).to.be.above(0);",
+              "});",
+              "",
+              "pm.test(\"Response time is acceptable\", function () {",
+              "    pm.expect(pm.response.responseTime).to.be.below(3000);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Test Voice API",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"baselineText\": \"I grew up in Texas. The landscape shaped who I am.\",\n  \"config\": {\n    \"slots\": [\n      {\n        \"text\": \"Sample text with moderate formality and clear structure.\",\n        \"weight\": 1.0\n      }\n    ]\n  }\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/test-voice",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "test-voice"]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test(\"Output exists\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData).to.have.property('output');",
+              "    pm.expect(jsonData.output).to.be.a('string');",
+              "    pm.expect(jsonData.output.length).to.be.above(0);",
+              "});",
+              "",
+              "pm.test(\"Tokens used is valid\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData).to.have.property('tokensUsed');",
+              "    pm.expect(jsonData.tokensUsed).to.be.a('number');",
+              "    pm.expect(jsonData.tokensUsed).to.be.above(0);",
+              "});",
+              "",
+              "pm.test(\"Response time is acceptable\", function () {",
+              "    pm.expect(pm.response.responseTime).to.be.below(5000);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    }
+  ]
+}
