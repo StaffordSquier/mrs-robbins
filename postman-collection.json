@@ -122,7 +122,7 @@
         ],
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"baselineText\": \"I grew up in Texas. The landscape shaped who I am.\",\n  \"config\": {\n    \"slots\": [\n      {\n        \"text\": \"Sample text with moderate formality and clear structure.\",\n        \"weight\": 1.0\n      }\n    ]\n  }\n}"
+          "raw": "{\n  \"baselineText\": \"I grew up in Texas. The landscape shaped who I am.\",\n  \"config\": {\n    \"slots\": [\n      {\n        \"id\": 1,\n        \"text\": \"The limestone cliffs of Bandera rise from the valley, weathered and ancient. I spent my childhood in their shadow, learning the weight of deep time.\",\n        \"source\": \"test\",\n        \"weight\": 1.0,\n        \"active\": true\n      }\n    ]\n  }\n}"
         },
         "url": {
           "raw": "{{baseUrl}}/api/test-voice",
