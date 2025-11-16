@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { calculateSpearman, calculateRSquared } from '@/lib/statistics';
 
 interface Variable {
   id: string;
@@ -193,54 +194,6 @@ export default function BatchEvaluator() {
     }
 
     setIsRunning(false);
-  };
-
-  const calculateSpearman = (x: number[], y: number[]): number => {
-    const n = x.length;
-    const rankX = getRanks(x);
-    const rankY = getRanks(y);
-    
-    let sumD2 = 0;
-    for (let i = 0; i < n; i++) {
-      const d = rankX[i] - rankY[i];
-      sumD2 += d * d;
-    }
-    
-    return 1 - (6 * sumD2) / (n * (n * n - 1));
-  };
-
-  const getRanks = (arr: number[]): number[] => {
-    const sorted = [...arr].map((val, idx) => ({ val, idx })).sort((a, b) => a.val - b.val);
-    const ranks = new Array(arr.length);
-    sorted.forEach((item, rank) => {
-      ranks[item.idx] = rank + 1;
-    });
-    return ranks;
-  };
-
-  const calculateRSquared = (x: number[], y: number[]): number => {
-    const n = x.length;
-    const meanY = y.reduce((a, b) => a + b, 0) / n;
-    
-    let sumXY = 0, sumX = 0, sumY = 0, sumX2 = 0;
-    for (let i = 0; i < n; i++) {
-      sumXY += x[i] * y[i];
-      sumX += x[i];
-      sumY += y[i];
-      sumX2 += x[i] * x[i];
-    }
-    
-    const slope = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
-    const intercept = (sumY - slope * sumX) / n;
-    
-    let ssRes = 0, ssTot = 0;
-    for (let i = 0; i < n; i++) {
-      const predicted = slope * x[i] + intercept;
-      ssRes += Math.pow(y[i] - predicted, 2);
-      ssTot += Math.pow(y[i] - meanY, 2);
-    }
-    
-    return 1 - (ssRes / ssTot);
   };
 
   const Sparkline = ({ data }: { data: number[] }) => (

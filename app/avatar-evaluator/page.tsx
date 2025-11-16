@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { VOICE_VARIABLES } from '@/lib/evaluation';
 
 interface EvaluationResult {
   variable: string;
@@ -12,18 +13,6 @@ interface EvaluationResult {
     evidence: string;
   }>;
 }
-
-const VARIABLES = [
-  { id: 'formality', name: 'Formality' },
-  { id: 'complexity', name: 'Complexity' },
-  { id: 'emotionality', name: 'Emotionality' },
-  { id: 'directness', name: 'Directness' },
-  { id: 'energy', name: 'Energy' },
-  { id: 'abstraction', name: 'Abstraction' },
-  { id: 'metaphor', name: 'Metaphor Density' },
-  { id: 'paragraph_length', name: 'Paragraph Length' },
-  { id: 'technical', name: 'Technical Depth' }
-];
 
 export default function AvatarEvaluator() {
   const [baselineText, setBaselineText] = useState('');
@@ -105,7 +94,7 @@ export default function AvatarEvaluator() {
       const effectiveness = delta >= 6.0 ? 'High' : delta >= 3.0 ? 'Medium' : 'Low';
 
       setResults({
-        variable: VARIABLES.find(v => v.id === selectedVariable)?.name || selectedVariable,
+        variable: VOICE_VARIABLES.find(v => v.id === selectedVariable)?.name || selectedVariable,
         delta: Math.round(delta * 10) / 10,
         effectiveness,
         results: scoredResults
@@ -189,7 +178,7 @@ export default function AvatarEvaluator() {
                   color: '#2B2B2B'
                 }}
               >
-                {VARIABLES.map(v => (
+                {VOICE_VARIABLES.map(v => (
                   <option key={v.id} value={v.id}>{v.name}</option>
                 ))}
               </select>

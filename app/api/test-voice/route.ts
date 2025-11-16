@@ -1,11 +1,6 @@
-// src/app/api/test-voice/route.ts
 import { NextRequest, NextResponse } from 'next/server';
-import Anthropic from '@anthropic-ai/sdk';
 import { generateVoiceDirectives, validateVoiceConfig, type VoiceConfig } from '@/lib/voice';
-
-const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY,
-});
+import { createMessage } from '@/lib/anthropic';
 
 export async function POST(request: NextRequest) {
   try {
@@ -39,17 +34,16 @@ export async function POST(request: NextRequest) {
     // Generate voice directives from mixer configuration
     const systemPrompt = generateVoiceDirectives(config);
 
-    // Call Claude API
-    const message = await anthropic.messages.create({
-      model: 'claude-sonnet-4-20250514',
-      max_tokens: 2000,
+    // Call Claude API through service
+    const message = await createMessage({
       system: systemPrompt,
       messages: [
         {
           role: 'user',
           content: baselineText
         }
-      ]
+      ],
+      maxTokens: 2000
     });
 
     // Extract text response
@@ -65,11 +59,13 @@ export async function POST(request: NextRequest) {
 
   } catch (error) {
     console.error('Test voice API error:', error);
-    
-    if (error instanceof Anthropic.APIError) {
+
+    // Check if it's an Anthropic API error
+    if (error && typeof error === 'object' && 'status' in error) {
+      const apiError = error as { status?: number; message?: string };
       return NextResponse.json(
-        { error: `Claude API error: ${error.message}` },
-        { status: error.status || 500 }
+        { error: `Claude API error: ${apiError.message || 'Unknown error'}` },
+        { status: apiError.status || 500 }
       );
     }
 
