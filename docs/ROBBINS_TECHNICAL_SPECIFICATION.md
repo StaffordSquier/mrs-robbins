@@ -2936,6 +2936,428 @@ and output structure - Endpoint Publication applies template formatting
 **Dependencies:** - Template library - Scoring frameworks (Rookery
 9-axis) - Export format generators
 
+------------------------------------------------------------------------
+
+### FEATURE 12: Hierarchical Context System (CARD A12)
+
+**Status:** ⚠️ Validated via Songwriting Use Case, Not Built
+
+**User Story:** As a writer working on complex projects, I want to provide context at multiple levels (document, section, line) so that AI-generated content is grounded in specific details rather than generic.
+
+**Acceptance Criteria:**
+- Uber-blob (document-level context) storable per project
+- Meta-blobs (section-level context) storable per section
+- Line-blobs (line-level context) storable per line
+- Context panel visible in Dialectical Editor showing all three levels
+- Voice Engine receives blobs when generating/editing text
+- Blobs are optional (graceful degradation if empty)
+- Context-aware content filters can reference blob constraints
+
+**Technical Implementation:**
+
+**Database Schema:**
+
+```sql
+-- Extend projects table
+ALTER TABLE projects ADD COLUMN uber_blob TEXT;
+ALTER TABLE projects ADD COLUMN uber_blob_created_at TIMESTAMPTZ;
+ALTER TABLE projects ADD COLUMN uber_blob_updated_at TIMESTAMPTZ;
+
+-- New sections table
+CREATE TABLE document_sections (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  project_id UUID REFERENCES projects(id) ON DELETE CASCADE,
+  section_name VARCHAR(255) NOT NULL,
+  meta_blob TEXT,
+  section_order INTEGER NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW(),
+  UNIQUE(project_id, section_order)
+);
+
+CREATE INDEX idx_sections_project ON document_sections(project_id);
+CREATE INDEX idx_sections_order ON document_sections(project_id, section_order);
+
+-- New document_lines table
+CREATE TABLE document_lines (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  section_id UUID REFERENCES document_sections(id) ON DELETE CASCADE,
+  line_text TEXT NOT NULL,
+  line_blob TEXT,
+  line_order INTEGER NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW(),
+  UNIQUE(section_id, line_order)
+);
+
+CREATE INDEX idx_lines_section ON document_lines(section_id);
+CREATE INDEX idx_lines_order ON document_lines(section_id, line_order);
+```
+
+**Data Models:**
+
+```typescript
+interface UberBlob {
+  content: string;
+  created_at: Date;
+  updated_at: Date;
+}
+
+interface DocumentSection {
+  id: string;
+  project_id: string;
+  section_name: string;
+  meta_blob?: string;
+  section_order: number;
+  lines: DocumentLine[];
+}
+
+interface DocumentLine {
+  id: string;
+  section_id: string;
+  line_text: string;
+  line_blob?: string;
+  line_order: number;
+}
+
+interface HierarchicalContext {
+  uber_blob?: string;
+  meta_blob?: string;
+  line_blob?: string;
+  current_section: DocumentSection;
+  all_sections: DocumentSection[];
+}
+```
+
+**API Endpoints:**
+
+```typescript
+// Uber-Blob Management
+POST /api/projects/:projectId/uber-blob
+Body: { content: string }
+Response: { success: boolean, uber_blob: UberBlob }
+
+GET /api/projects/:projectId/uber-blob
+Response: { uber_blob: UberBlob | null }
+
+DELETE /api/projects/:projectId/uber-blob
+Response: { success: boolean }
+
+// Section (Meta-Blob) Management
+POST /api/projects/:projectId/sections
+Body: { section_name: string, meta_blob?: string, section_order: number }
+Response: { success: boolean, section: DocumentSection }
+
+PATCH /api/sections/:sectionId/meta-blob
+Body: { meta_blob: string }
+Response: { success: boolean, section: DocumentSection }
+
+GET /api/projects/:projectId/sections
+Response: { sections: DocumentSection[] }
+
+PATCH /api/projects/:projectId/sections/reorder
+Body: { section_orders: Array<{section_id: string, new_order: number}> }
+Response: { success: boolean }
+
+// Line (Line-Blob) Management
+POST /api/sections/:sectionId/lines
+Body: { line_text: string, line_blob?: string, line_order: number }
+Response: { success: boolean, line: DocumentLine }
+
+PATCH /api/lines/:lineId/line-blob
+Body: { line_blob: string }
+Response: { success: boolean, line: DocumentLine }
+
+GET /api/lines/:lineId/context
+Response: { context: HierarchicalContext }
+```
+
+**UI Components:**
+
+Context Panel Layout (Dialectical Editor Sidebar):
+
+```
+┌─────────────────────────────┐
+│ 📋 Project Context          │
+├─────────────────────────────┤
+│ Uber-Blob:                  │
+│ [Collapsible text area]     │
+│ "This song is about..."     │
+├─────────────────────────────┤
+│ 📄 Section Context          │
+│ Current: Verse 1            │
+├─────────────────────────────┤
+│ Meta-Blob:                  │
+│ [Collapsible text area]     │
+│ "Murphy's Bar, 5th St..."   │
+├─────────────────────────────┤
+│ 📝 Line Context             │
+│ Line 3 selected             │
+├─────────────────────────────┤
+│ Line-Blob:                  │
+│ [Collapsible text area]     │
+│ "Emotional hinge..."        │
+└─────────────────────────────┘
+```
+
+**Integration with Card A1 (Voice Translation Engine):**
+
+```typescript
+function buildPromptWithContext(
+  userInput: string,
+  avatar: VoiceAvatar,
+  context: HierarchicalContext
+): string {
+  const voiceDirectives = getVoiceDirectives(avatar.config);
+
+  const contextualPrompt = `
+${voiceDirectives}
+
+PROJECT CONTEXT (Uber-Blob):
+${context.uber_blob || 'None provided'}
+
+SECTION CONTEXT (Meta-Blob):
+${context.meta_blob || 'None provided'}
+
+LINE CONTEXT (Line-Blob):
+${context.line_blob || 'None provided'}
+
+CURRENT SECTION:
+${context.current_section.lines.map(l => l.line_text).join('\n')}
+
+USER REQUEST:
+${userInput}
+`;
+
+  return contextualPrompt;
+}
+```
+
+**Integration with Card A4 (Hot/Warm/Cold Context):**
+
+```typescript
+function buildEditingContext(line_id: string): EditingContext {
+  const line = getLine(line_id);
+  const section = getSection(line.section_id);
+  const project = getProject(section.project_id);
+
+  return {
+    hot: {
+      current_line: line,
+      surrounding_lines: getSurroundingLines(line, 3)
+    },
+    warm: {
+      uber_blob: project.uber_blob,
+      meta_blob: section.meta_blob,
+      line_blob: line.line_blob,
+      full_section: section.lines
+    },
+    cold: {
+      related_sections: semanticSearch(line.line_text, project.id),
+      related_projects: semanticSearch(line.line_text, user.id)
+    }
+  };
+}
+```
+
+**Integration with Card C1 (Content Filtering System):**
+
+Context-aware filters:
+
+```typescript
+// Trope detector checks voice constraints in uber-blob
+function detectTropes(
+  line: string,
+  context: HierarchicalContext
+): FilterResult {
+  const voiceConstraints = extractConstraints(context.uber_blob);
+
+  if (voiceConstraints.includes("avoid_hallmark_sentiment")) {
+    if (matchesHallmarkPattern(line)) {
+      return {
+        flagged: true,
+        message: "This line may be too sentimental based on your voice profile",
+        suggestion: "Consider a more restrained expression"
+      };
+    }
+  }
+
+  return { flagged: false };
+}
+
+// Coherence checker validates line matches meta-blob intent
+function checkCoherence(
+  line: string,
+  meta_blob: string
+): FilterResult {
+  const sectionIntent = extractIntent(meta_blob);
+  const lineIntent = analyzeLineIntent(line);
+
+  if (!intentsAlign(sectionIntent, lineIntent)) {
+    return {
+      flagged: true,
+      message: "This line may drift from section intent",
+      suggestion: "Review meta-blob: " + meta_blob.substring(0, 100)
+    };
+  }
+
+  return { flagged: false };
+}
+```
+
+**Integration with Card B1 (Dialectical Editor):**
+
+Enhanced dialectic loop with blob awareness:
+
+```typescript
+async function handleUserEdit(
+  lineId: string,
+  userRequest: string
+): Promise<AssistantResponse> {
+  const context = buildEditingContext(lineId);
+
+  // Check if meta-blob exists for grounding
+  if (!context.warm.meta_blob) {
+    return {
+      type: 'suggestion',
+      message: `I can make this more specific, but I don't have grounding
+                details. Can you tell me: Where is this scene happening?
+                What sensory details should I include?`,
+      actions: [
+        { label: 'Add section context', action: 'create_meta_blob' },
+        { label: 'Just rewrite it generically', action: 'proceed_without_context' }
+      ]
+    };
+  }
+
+  // Generate with full context
+  const prompt = buildPromptWithContext(
+    userRequest,
+    getUserAvatar(),
+    context.warm
+  );
+
+  const response = await callClaudeAPI(prompt);
+
+  return {
+    type: 'generation',
+    content: response,
+    context_used: {
+      uber_blob: !!context.warm.uber_blob,
+      meta_blob: !!context.warm.meta_blob,
+      line_blob: !!context.warm.line_blob
+    }
+  };
+}
+```
+
+**Real-World Use Case Examples:**
+
+**Example 1: Songwriter (Validated Use Case - November 2025)**
+
+```
+Project: "Murphy's Bar Song"
+Avatar: Singer-Songwriter
+
+Uber-Blob:
+"Song about accepting the end of a relationship without
+bitterness. Themes: memory, acceptance, unresolved hope.
+Emotional arc: discovery → remembrance → quiet acceptance.
+No Hallmark sentiment, no neat resolution."
+
+Section: Verse 1
+Meta-Blob:
+"Scene: Murphy's Bar on 5th Street. Wednesday afternoon,
+mostly empty. Dark wood, smells like stale beer and worn
+leather. Protagonist orders whiskey neat. The bartender
+knows their usual order."
+
+Line 3
+Line-Blob:
+"The emotional hinge - receipt triggers memory cascade.
+Sting + warmth simultaneously. Don't resolve."
+
+Editing Experience:
+- User selects Line 3
+- Context panel shows all three blobs
+- User: "Make this more grounded"
+- System generates using: Murphy's Bar details + emotional
+  hinge intent + singer-songwriter voice
+- Result: Specific, grounded line that maintains emotional
+  complexity
+```
+
+**Example 2: Business Plan Writer**
+
+```
+Project: "PhotoNest Business Plan"
+Avatar: Business Writer
+
+Uber-Blob:
+"Photography SaaS targeting professional photographers.
+Core value: Client galleries + print fulfillment. Must
+demonstrate $85K Year 1 revenue viability with conservative
+assumptions. Audience: potential investors/advisors."
+
+Section: Market Analysis
+Meta-Blob:
+"Establish TAM ($8.66B). Validate with photographer pain
+points from Santa Fe Workshops research. Cite comparables
+(Pixieset, ShootProof). Conservative but credible. Support
+pricing strategy."
+
+Line: Revenue Projection Paragraph
+Line-Blob:
+"Show math: 200 photographers × $30/mo × 70% retention.
+Cite industry benchmarks. Acknowledge this is conservative."
+
+Editing Experience:
+- User: "Expand revenue projections"
+- System sees business writer avatar + meta-blob requirements
+- Generates: Conservative math with cited benchmarks, maintains
+  professional tone
+- Avoids: Unrealistic hockey-stick growth, unsupported claims
+```
+
+**Example 3: Academic Researcher**
+
+```
+Project: "Machine Learning Ethics Paper"
+Avatar: Academic
+
+Uber-Blob:
+"Argument: Current AI ethics frameworks inadequately
+address emergent behavior in large language models.
+Propose new framework based on dynamical systems theory.
+Audience: peer-reviewed journal submission."
+
+Section: Literature Review
+Meta-Blob:
+"Survey existing frameworks (Crawford, Whittaker, etc.).
+Identify gaps. Build case for dynamical systems approach.
+Must be comprehensive but critical."
+
+Line: Crawford Citation Analysis
+Line-Blob:
+"Acknowledge Crawford's contribution to algorithmic
+accountability while showing limitations for emergent
+systems. Respectful but clear critique."
+```
+
+**Dependencies:**
+- Database infrastructure (Supabase PostgreSQL)
+- Card B1 (Dialectical Editor) - blobs integrate into editing flow
+- Card A1 (Voice Translation Engine) - blobs feed into prompts
+- Card A4 (Hot/Warm/Cold Context) - blobs classified as warm context
+- Authentication system - must know project ownership
+
+**Integration Points:**
+- Voice Translation Engine (Card A1): Receives blobs in prompt construction
+- Hot/Warm/Cold Context (Card A4): Blobs stored as warm context
+- Content Filtering (Card C1): Filters become context-aware
+- Dialectical Editor (Card B1): Context panel integrated into UI
+- Document Preparation Workspace (Card B2): Optional blob creation during setup
+
 ## CHUNK 11 of 29: Feature Specifications - Workflow & Interaction Features
 
 ### FEATURE 12: Dialectic Conversation Interface (CARD B1)
