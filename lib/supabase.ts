@@ -11,16 +11,16 @@ import { createClient } from '@supabase/supabase-js';
 // ENVIRONMENT VALIDATION
 // =============================================================================
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-
-if (!supabaseUrl) {
-  throw new Error('Missing NEXT_PUBLIC_SUPABASE_URL environment variable');
+function getRequiredEnvVar(name: string): string {
+  const value = process.env[name];
+  if (!value) {
+    throw new Error(`Missing ${name} environment variable`);
+  }
+  return value;
 }
 
-if (!supabaseAnonKey) {
-  throw new Error('Missing NEXT_PUBLIC_SUPABASE_ANON_KEY environment variable');
-}
+const supabaseUrl = getRequiredEnvVar('NEXT_PUBLIC_SUPABASE_URL');
+const supabaseAnonKey = getRequiredEnvVar('NEXT_PUBLIC_SUPABASE_ANON_KEY');
 
 // =============================================================================
 // DATABASE TYPES
