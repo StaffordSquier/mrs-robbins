@@ -139,7 +139,7 @@ export default function MrsRobbinsConversation() {
               <div
                 className={`max-w-2xl rounded-lg p-4 ${
                   message.role === 'user'
-                    ? 'bg-[#2C7A7B] text-white'
+                    ? 'bg-[#0D9488] text-white'
                     : 'bg-white text-[#2B2B2B] border border-[#8A8A8A]'
                 }`}
               >
@@ -170,13 +170,13 @@ export default function MrsRobbinsConversation() {
               onChange={(e) => setInputText(e.target.value)}
               onKeyPress={handleKeyPress}
               placeholder="Share your thoughts..."
-              className="flex-1 p-3 border border-[#8A8A8A] rounded-lg resize-none focus:ring-2 focus:ring-[#2C7A7B] focus:border-[#2C7A7B] text-[#2B2B2B]"
+              className="flex-1 p-3 border border-[#8A8A8A] rounded-lg resize-none focus:ring-2 focus:ring-[#0D9488] focus:border-[#0D9488] text-[#2B2B2B]"
               rows={3}
             />
             <button
               onClick={sendMessage}
               disabled={!inputText.trim() || isLoading}
-              className="px-6 bg-[#2C7A7B] text-white font-medium rounded-lg hover:bg-[#236366] disabled:bg-[#8A8A8A] disabled:cursor-not-allowed transition-colors"
+              className="px-6 bg-[#0D9488] text-white font-medium rounded-lg hover:bg-[#0B7C73] disabled:bg-[#8A8A8A] disabled:cursor-not-allowed transition-colors"
             >
               Send
             </button>
@@ -197,7 +197,7 @@ export default function MrsRobbinsConversation() {
             {slots.length < 5 && (
               <button
                 onClick={addSlot}
-                className="text-sm text-[#2C7A7B] hover:text-[#236366] font-medium"
+                className="text-sm text-[#0D9488] hover:text-[#0B7C73] font-medium"
               >
                 + Add
               </button>
@@ -221,7 +221,7 @@ export default function MrsRobbinsConversation() {
               <select
                 value={slot.variable}
                 onChange={(e) => updateSlot(slot.id, 'variable', e.target.value)}
-                className="w-full p-2 border border-[#8A8A8A] rounded-md mb-3 text-[#2B2B2B] font-medium bg-white focus:ring-2 focus:ring-[#2C7A7B] focus:border-[#2C7A7B]"
+                className="w-full p-2 border border-[#8A8A8A] rounded-md mb-3 text-[#2B2B2B] font-medium bg-white focus:ring-2 focus:ring-[#0D9488] focus:border-[#0D9488]"
               >
                 <option value="formality">Formality</option>
                 <option value="complexity">Complexity</option>
@@ -241,7 +241,7 @@ export default function MrsRobbinsConversation() {
                   max="10"
                   value={slot.value}
                   onChange={(e) => updateSlot(slot.id, 'value', parseInt(e.target.value))}
-                  className="w-full h-2 bg-[#8A8A8A] rounded-lg appearance-none cursor-pointer accent-[#2C7A7B]"
+                  className="w-full h-2 bg-[#8A8A8A] rounded-lg appearance-none cursor-pointer accent-[#0D9488]"
                 />
               </div>
             </div>

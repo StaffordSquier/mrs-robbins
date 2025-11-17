@@ -2,7 +2,6 @@ import { createServiceClient } from './supabase';
 import { v4 as uuidv4 } from 'uuid';
 
 const DEMO_USER_EMAIL = 'stafford@staffordsquier.com';
-const DEMO_USER_NAME = 'Stafford Squier';
 
 /**
  * Gets or creates the demo user for the application.
@@ -38,7 +37,6 @@ export async function getOrCreateDemoUser(): Promise<string> {
   const userData = {
     id: userId,
     email: DEMO_USER_EMAIL,
-    name: DEMO_USER_NAME,
   };
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

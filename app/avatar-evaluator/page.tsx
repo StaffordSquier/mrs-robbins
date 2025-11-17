@@ -189,7 +189,7 @@ export default function AvatarEvaluator() {
               disabled={isRunning || !baselineText.trim()}
               style={{
                 padding: '0.75rem 1.5rem',
-                backgroundColor: isRunning ? '#8A8A8A' : '#2C7A7B',
+                backgroundColor: isRunning ? '#8A8A8A' : '#0D9488',
                 color: 'white',
                 border: 'none',
                 borderRadius: '6px',
@@ -209,7 +209,7 @@ export default function AvatarEvaluator() {
                   style={{
                     width: `${progress}%`,
                     height: '100%',
-                    backgroundColor: '#2C7A7B',
+                    backgroundColor: '#0D9488',
                     transition: 'width 0.3s'
                   }}
                 />
@@ -259,7 +259,7 @@ export default function AvatarEvaluator() {
                   onClick={exportToCSV}
                   style={{
                     padding: '0.5rem 1rem',
-                    backgroundColor: '#2C7A7B',
+                    backgroundColor: '#0D9488',
                     color: 'white',
                     border: 'none',
                     borderRadius: '6px',

@@ -223,7 +223,7 @@ export default function BatchEvaluator() {
             return `${x},${y}`;
           }).join(' ')}
           fill="none"
-          stroke="#2C7A7B"
+          stroke="#0D9488"
           strokeWidth="2"
         />
       </svg>
@@ -247,8 +247,8 @@ export default function BatchEvaluator() {
                 padding: '0.75rem 1.5rem',
                 background: 'none',
                 border: 'none',
-                borderBottom: activeTab === tab ? '3px solid #2C7A7B' : '3px solid transparent',
-                color: activeTab === tab ? '#2C7A7B' : '#2B2B2B',
+                borderBottom: activeTab === tab ? '3px solid #0D9488' : '3px solid transparent',
+                color: activeTab === tab ? '#0D9488' : '#2B2B2B',
                 fontWeight: activeTab === tab ? '600' : 'normal',
                 cursor: 'pointer',
                 textTransform: 'capitalize',
@@ -272,7 +272,7 @@ export default function BatchEvaluator() {
                 }}
                 style={{
                   padding: '0.5rem 1rem',
-                  backgroundColor: '#2C7A7B',
+                  backgroundColor: '#0D9488',
                   color: 'white',
                   border: 'none',
                   borderRadius: '6px',
@@ -329,7 +329,7 @@ export default function BatchEvaluator() {
                       }}
                       style={{
                         padding: '0.375rem 0.75rem',
-                        backgroundColor: '#2C7A7B',
+                        backgroundColor: '#0D9488',
                         color: 'white',
                         border: 'none',
                         borderRadius: '4px',
@@ -359,7 +359,7 @@ export default function BatchEvaluator() {
                 }}
                 style={{
                   padding: '0.5rem 1rem',
-                  backgroundColor: '#2C7A7B',
+                  backgroundColor: '#0D9488',
                   color: 'white',
                   border: 'none',
                   borderRadius: '6px',
@@ -416,7 +416,7 @@ export default function BatchEvaluator() {
                       }}
                       style={{
                         padding: '0.375rem 0.75rem',
-                        backgroundColor: '#2C7A7B',
+                        backgroundColor: '#0D9488',
                         color: 'white',
                         border: 'none',
                         borderRadius: '4px',
@@ -459,7 +459,7 @@ export default function BatchEvaluator() {
                   disabled={variables.filter(v => v.enabled).length === 0 || baselines.filter(b => b.enabled).length === 0}
                   style={{
                     padding: '0.75rem 1.5rem',
-                    backgroundColor: variables.filter(v => v.enabled).length === 0 || baselines.filter(b => b.enabled).length === 0 ? '#A0AEC0' : '#2C7A7B',
+                    backgroundColor: variables.filter(v => v.enabled).length === 0 || baselines.filter(b => b.enabled).length === 0 ? '#A0AEC0' : '#0D9488',
                     color: 'white',
                     border: 'none',
                     borderRadius: '6px',
@@ -523,7 +523,7 @@ export default function BatchEvaluator() {
                       style={{
                         width: `${progress.total > 0 ? (progress.current / progress.total) * 100 : 0}%`,
                         height: '100%',
-                        backgroundColor: '#2C7A7B',
+                        backgroundColor: '#0D9488',
                         transition: 'width 0.3s',
                       }}
                     />
@@ -572,7 +572,7 @@ export default function BatchEvaluator() {
                                 onClick={() => setSelectedResult(result)}
                                 style={{
                                   padding: '0.375rem 0.75rem',
-                                  backgroundColor: '#2C7A7B',
+                                  backgroundColor: '#0D9488',
                                   color: 'white',
                                   border: 'none',
                                   borderRadius: '4px',
@@ -705,7 +705,7 @@ export default function BatchEvaluator() {
                     type="submit"
                     style={{
                       padding: '0.5rem 1rem',
-                      backgroundColor: '#2C7A7B',
+                      backgroundColor: '#0D9488',
                       color: 'white',
                       border: 'none',
                       borderRadius: '4px',
@@ -831,7 +831,7 @@ export default function BatchEvaluator() {
                     type="submit"
                     style={{
                       padding: '0.5rem 1rem',
-                      backgroundColor: '#2C7A7B',
+                      backgroundColor: '#0D9488',
                       color: 'white',
                       border: 'none',
                       borderRadius: '4px',
@@ -881,7 +881,7 @@ export default function BatchEvaluator() {
                     <XAxis dataKey="setting" label={{ value: 'Setting', position: 'insideBottom', offset: -5 }} />
                     <YAxis label={{ value: 'Score', angle: -90, position: 'insideLeft' }} />
                     <Tooltip />
-                    <Line type="monotone" dataKey="delta" stroke="#2C7A7B" strokeWidth={2} name="Delta" />
+                    <Line type="monotone" dataKey="delta" stroke="#0D9488" strokeWidth={2} name="Delta" />
                     <Line type="monotone" dataKey="effectiveness" stroke="#10B981" strokeWidth={2} name="Effectiveness" />
                   </LineChart>
                 </ResponsiveContainer>

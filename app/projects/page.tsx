@@ -115,7 +115,7 @@ export default function ProjectsPage() {
             onClick={() => setShowCreateModal(true)}
             style={{
               padding: '0.75rem 1.5rem',
-              backgroundColor: '#2C7A7B',
+              backgroundColor: '#0D9488',
               color: 'white',
               border: 'none',
               borderRadius: '6px',
@@ -167,7 +167,7 @@ export default function ProjectsPage() {
               onClick={() => setShowCreateModal(true)}
               style={{
                 padding: '0.75rem 1.5rem',
-                backgroundColor: '#2C7A7B',
+                backgroundColor: '#0D9488',
                 color: 'white',
                 border: 'none',
                 borderRadius: '6px',
@@ -228,7 +228,7 @@ export default function ProjectsPage() {
                   <button
                     style={{
                       padding: '0.5rem 1rem',
-                      backgroundColor: '#2C7A7B',
+                      backgroundColor: '#0D9488',
                       color: 'white',
                       border: 'none',
                       borderRadius: '4px',
@@ -342,7 +342,7 @@ export default function ProjectsPage() {
                   disabled={!newProjectTitle.trim() || isCreating}
                   style={{
                     padding: '0.75rem 1.5rem',
-                    backgroundColor: (!newProjectTitle.trim() || isCreating) ? '#A0AEC0' : '#2C7A7B',
+                    backgroundColor: (!newProjectTitle.trim() || isCreating) ? '#A0AEC0' : '#0D9488',
                     color: 'white',
                     border: 'none',
                     borderRadius: '6px',

@@ -89,7 +89,7 @@ export default function AvatarTuner() {
               <textarea
                 value={baselineText}
                 onChange={(e) => setBaselineText(e.target.value)}
-                className="w-full h-32 min-h-[128px] p-3 border border-[#8A8A8A] rounded-md resize-y focus:ring-2 focus:ring-[#2C7A7B] focus:border-[#2C7A7B] text-[#2B2B2B] bg-white"
+                className="w-full h-32 min-h-[128px] p-3 border border-[#8A8A8A] rounded-md resize-y focus:ring-2 focus:ring-[#0D9488] focus:border-[#0D9488] text-[#2B2B2B] bg-white"
                 placeholder="Enter your baseline text here..."
               />
             </div>
@@ -102,7 +102,7 @@ export default function AvatarTuner() {
                 {slots.length < 5 && (
                   <button
                     onClick={addSlot}
-                    className="px-3 py-1 text-sm bg-[#2C7A7B] text-white rounded-md hover:bg-[#236366] transition-colors"
+                    className="px-3 py-1 text-sm bg-[#0D9488] text-white rounded-md hover:bg-[#0B7C73] transition-colors"
                   >
                     + Add Slot
                   </button>
@@ -127,7 +127,7 @@ export default function AvatarTuner() {
                     <select
                       value={slot.variable}
                       onChange={(e) => updateSlot(slot.id, 'variable', e.target.value)}
-                      className="w-full p-2 border border-[#8A8A8A] rounded-md mb-3 text-[#2B2B2B] font-medium bg-white focus:ring-2 focus:ring-[#2C7A7B] focus:border-[#2C7A7B]"
+                      className="w-full p-2 border border-[#8A8A8A] rounded-md mb-3 text-[#2B2B2B] font-medium bg-white focus:ring-2 focus:ring-[#0D9488] focus:border-[#0D9488]"
                     >
                       <option value="formality">Formality</option>
                       <option value="complexity">Complexity</option>
@@ -147,7 +147,7 @@ export default function AvatarTuner() {
                         max="10"
                         value={slot.value}
                         onChange={(e) => updateSlot(slot.id, 'value', parseInt(e.target.value))}
-                        className="w-full h-2 bg-[#8A8A8A] rounded-lg appearance-none cursor-pointer accent-[#2C7A7B]"
+                        className="w-full h-2 bg-[#8A8A8A] rounded-lg appearance-none cursor-pointer accent-[#0D9488]"
                       />
                       <p className="text-xs text-[#6A6A6A] mt-2">
                         Controls casual vs. formal language style
@@ -161,7 +161,7 @@ export default function AvatarTuner() {
             <button
               onClick={testVoice}
               disabled={!baselineText.trim() || isLoading}
-              className="w-full py-3 bg-[#2C7A7B] text-white font-medium rounded-md hover:bg-[#236366] disabled:bg-[#8A8A8A] disabled:cursor-not-allowed transition-colors"
+              className="w-full py-3 bg-[#0D9488] text-white font-medium rounded-md hover:bg-[#0B7C73] disabled:bg-[#8A8A8A] disabled:cursor-not-allowed transition-colors"
             >
               {isLoading ? 'Testing Voice...' : 'Test Voice'}
             </button>

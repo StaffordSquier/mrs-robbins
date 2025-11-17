@@ -288,7 +288,7 @@ export default function VoiceCapture() {
                 disabled={isRecording || isUploading || isTranscribing}
                 style={{
                   padding: '0.75rem 1.5rem',
-                  backgroundColor: '#2C7A7B',
+                  backgroundColor: '#0D9488',
                   color: 'white',
                   border: 'none',
                   borderRadius: '6px',
@@ -325,7 +325,7 @@ export default function VoiceCapture() {
                 }}
               >
                 <option value="">Select a project...</option>
-                <option value="create-new" style={{ fontWeight: '600', color: '#2C7A7B' }}>
+                <option value="create-new" style={{ fontWeight: '600', color: '#0D9488' }}>
                   + Create New Project
                 </option>
                 <option disabled>──────────</option>
@@ -352,7 +352,7 @@ export default function VoiceCapture() {
           <div style={{
             fontSize: '3rem',
             fontWeight: '600',
-            color: isRecording ? '#E53E3E' : '#2B2B2B',
+            color: isRecording ? '#0D9488' : '#2B2B2B',
             marginBottom: '1.5rem',
             fontFamily: 'monospace',
           }}>
@@ -372,10 +372,10 @@ export default function VoiceCapture() {
                 width: '12px',
                 height: '12px',
                 borderRadius: '50%',
-                backgroundColor: '#E53E3E',
+                backgroundColor: '#0D9488',
                 animation: 'pulse 1.5s infinite',
               }} />
-              <span style={{ color: '#E53E3E', fontWeight: '500' }}>Recording</span>
+              <span style={{ color: '#0D9488', fontWeight: '500' }}>Recording</span>
             </div>
           )}
 
@@ -386,7 +386,7 @@ export default function VoiceCapture() {
               disabled={isUploading || isTranscribing || !!audioBlob}
               style={{
                 padding: '1rem 2rem',
-                backgroundColor: audioBlob ? '#A0AEC0' : '#E53E3E',
+                backgroundColor: audioBlob ? '#A0AEC0' : '#0D9488',
                 color: 'white',
                 border: 'none',
                 borderRadius: '8px',
@@ -403,7 +403,7 @@ export default function VoiceCapture() {
               onClick={stopRecording}
               style={{
                 padding: '1rem 2rem',
-                backgroundColor: '#2C7A7B',
+                backgroundColor: '#0D9488',
                 color: 'white',
                 border: 'none',
                 borderRadius: '8px',
@@ -442,7 +442,7 @@ export default function VoiceCapture() {
                 style={{
                   flex: 1,
                   padding: '0.75rem',
-                  backgroundColor: (!selectedProjectId || isUploading || isTranscribing) ? '#A0AEC0' : '#2C7A7B',
+                  backgroundColor: (!selectedProjectId || isUploading || isTranscribing) ? '#A0AEC0' : '#0D9488',
                   color: 'white',
                   border: 'none',
                   borderRadius: '6px',
@@ -636,7 +636,7 @@ export default function VoiceCapture() {
                 disabled={isCreatingProject || !newProjectName.trim()}
                 style={{
                   padding: '0.75rem 1.5rem',
-                  backgroundColor: (isCreatingProject || !newProjectName.trim()) ? '#A0AEC0' : '#2C7A7B',
+                  backgroundColor: (isCreatingProject || !newProjectName.trim()) ? '#A0AEC0' : '#0D9488',
                   color: 'white',
                   border: 'none',
                   borderRadius: '6px',
