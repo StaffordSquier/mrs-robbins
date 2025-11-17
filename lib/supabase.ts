@@ -3,24 +3,31 @@
  *
  * Provides configured Supabase clients for browser and server contexts.
  * Includes TypeScript types for database tables.
+ *
+ * NOTE: This module gracefully handles missing environment variables
+ * to allow builds to complete without Supabase configured.
  */
 
-import { createClient } from '@supabase/supabase-js';
+import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
 // =============================================================================
-// ENVIRONMENT VALIDATION
+// ENVIRONMENT CONFIGURATION
 // =============================================================================
 
-function getRequiredEnvVar(name: string): string {
-  const value = process.env[name];
-  if (!value) {
-    throw new Error(`Missing ${name} environment variable`);
-  }
-  return value;
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+/**
+ * Check if Supabase is configured
+ */
+export const isSupabaseConfigured = !!(supabaseUrl && supabaseAnonKey);
+
+// Log warning at build time if not configured (but don't throw)
+if (!isSupabaseConfigured && typeof window === 'undefined') {
+  console.warn(
+    '⚠️  Supabase not configured. Set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY to enable database features.'
+  );
 }
-
-const supabaseUrl = getRequiredEnvVar('NEXT_PUBLIC_SUPABASE_URL');
-const supabaseAnonKey = getRequiredEnvVar('NEXT_PUBLIC_SUPABASE_ANON_KEY');
 
 // =============================================================================
 // DATABASE TYPES
@@ -400,21 +407,43 @@ export interface Database {
 /**
  * Supabase client for browser/client-side usage
  * Uses anon key - respects Row Level Security
+ * Returns null if Supabase is not configured
  */
-export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey);
+export const supabase: SupabaseClient<Database> | null = isSupabaseConfigured
+  ? createClient<Database>(supabaseUrl!, supabaseAnonKey!)
+  : null;
+
+/**
+ * Get the Supabase client, throwing if not configured
+ * Use this when Supabase is required for an operation
+ */
+export function getSupabaseClient(): SupabaseClient<Database> {
+  if (!supabase) {
+    throw new Error(
+      'Supabase is not configured. Set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY environment variables.'
+    );
+  }
+  return supabase;
+}
 
 /**
  * Create a Supabase client with service role key for server-side operations
  * Bypasses Row Level Security - use only in secure server contexts
  */
-export function createServiceClient() {
+export function createServiceClient(): SupabaseClient<Database> {
+  if (!isSupabaseConfigured) {
+    throw new Error(
+      'Supabase is not configured. Set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY environment variables.'
+    );
+  }
+
   const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
   if (!serviceKey) {
     throw new Error('Missing SUPABASE_SERVICE_ROLE_KEY environment variable');
   }
 
-  return createClient<Database>(supabaseUrl, serviceKey);
+  return createClient<Database>(supabaseUrl!, serviceKey);
 }
 
 // =============================================================================
@@ -423,26 +452,40 @@ export function createServiceClient() {
 
 /**
  * Get current authenticated user
+ * Returns null if Supabase is not configured
  */
 export async function getCurrentUser() {
-  const { data: { user }, error } = await supabase.auth.getUser();
+  if (!supabase) return null;
+
+  const {
+    data: { user },
+    error,
+  } = await supabase.auth.getUser();
   if (error) throw error;
   return user;
 }
 
 /**
  * Check if user is authenticated
+ * Returns false if Supabase is not configured
  */
 export async function isAuthenticated(): Promise<boolean> {
-  const { data: { session } } = await supabase.auth.getSession();
+  if (!supabase) return false;
+
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
   return !!session;
 }
 
 /**
  * Get user's projects
+ * Throws if Supabase is not configured
  */
 export async function getUserProjects(userId: string) {
-  const { data, error } = await supabase
+  const client = getSupabaseClient();
+
+  const { data, error } = await client
     .from('projects')
     .select('*')
     .eq('user_id', userId)
@@ -454,9 +497,12 @@ export async function getUserProjects(userId: string) {
 
 /**
  * Get user's voice avatars
+ * Throws if Supabase is not configured
  */
 export async function getUserVoiceAvatars(userId: string) {
-  const { data, error } = await supabase
+  const client = getSupabaseClient();
+
+  const { data, error } = await client
     .from('voice_avatars')
     .select('*')
     .eq('user_id', userId)
@@ -468,9 +514,12 @@ export async function getUserVoiceAvatars(userId: string) {
 
 /**
  * Get default voice avatar for user
+ * Throws if Supabase is not configured
  */
 export async function getDefaultVoiceAvatar(userId: string) {
-  const { data, error } = await supabase
+  const client = getSupabaseClient();
+
+  const { data, error } = await client
     .from('voice_avatars')
     .select('*')
     .eq('user_id', userId)
