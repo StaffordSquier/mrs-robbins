@@ -73,6 +73,7 @@ export default function BatchEvaluator() {
   const [results, setResults] = useState<TestResult[]>([]);
   const [isRunning, setIsRunning] = useState(false);
   const [progress, setProgress] = useState({ current: 0, total: 0 });
+  const [currentTest, setCurrentTest] = useState<{ variable: string; baseline: string; setting: number } | null>(null);
   const [showVariableModal, setShowVariableModal] = useState(false);
   const [showBaselineModal, setShowBaselineModal] = useState(false);
   const [editingVariable, setEditingVariable] = useState<Variable | null>(null);
@@ -114,6 +115,7 @@ export default function BatchEvaluator() {
 
     setIsRunning(true);
     setProgress({ current: 0, total: totalTests });
+    setCurrentTest(null);
     setResults([]);
 
     const newResults: TestResult[] = [];
@@ -124,6 +126,7 @@ export default function BatchEvaluator() {
           // Generate outputs for settings 1-10
           const outputs = [];
           for (let setting = 1; setting <= 10; setting++) {
+            setCurrentTest({ variable: variable.name, baseline: baseline.name, setting });
             const response = await fetch('/api/test-voice', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
@@ -194,6 +197,7 @@ export default function BatchEvaluator() {
     }
 
     setIsRunning(false);
+    setCurrentTest(null);
   };
 
   const Sparkline = ({ data }: { data: number[] }) => (
@@ -436,11 +440,11 @@ export default function BatchEvaluator() {
                   disabled={variables.filter(v => v.enabled).length === 0 || baselines.filter(b => b.enabled).length === 0}
                   style={{
                     padding: '0.75rem 1.5rem',
-                    backgroundColor: '#2C7A7B',
+                    backgroundColor: variables.filter(v => v.enabled).length === 0 || baselines.filter(b => b.enabled).length === 0 ? '#A0AEC0' : '#2C7A7B',
                     color: 'white',
                     border: 'none',
                     borderRadius: '6px',
-                    cursor: 'pointer',
+                    cursor: variables.filter(v => v.enabled).length === 0 || baselines.filter(b => b.enabled).length === 0 ? 'not-allowed' : 'pointer',
                     fontSize: '1rem',
                     fontWeight: '600',
                   }}
@@ -449,10 +453,53 @@ export default function BatchEvaluator() {
                 </button>
               ) : (
                 <div>
-                  <div style={{ marginBottom: '0.5rem', color: '#2B2B2B' }}>
-                    Running: {progress.current} / {progress.total} tests complete
+                  <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.75rem',
+                    marginBottom: '1rem',
+                    padding: '0.75rem',
+                    backgroundColor: '#EBF8FF',
+                    borderRadius: '6px',
+                    border: '1px solid #90CDF4'
+                  }}>
+                    <div style={{
+                      width: '20px',
+                      height: '20px',
+                      border: '3px solid #3182CE',
+                      borderTopColor: 'transparent',
+                      borderRadius: '50%',
+                      animation: 'spin 1s linear infinite',
+                    }} />
+                    <div style={{ color: '#2B6CB0', fontWeight: '500' }}>
+                      Running tests... {progress.current} / {progress.total} completed
+                    </div>
                   </div>
-                  <div style={{ width: '100%', height: '8px', backgroundColor: '#E2E8F0', borderRadius: '4px', overflow: 'hidden' }}>
+
+                  {currentTest && (
+                    <div style={{
+                      marginBottom: '1rem',
+                      padding: '0.75rem',
+                      backgroundColor: '#F7FAFC',
+                      borderRadius: '6px',
+                      border: '1px solid #E2E8F0'
+                    }}>
+                      <div style={{ fontSize: '0.875rem', color: '#4A5568', marginBottom: '0.25rem' }}>
+                        Currently testing:
+                      </div>
+                      <div style={{ color: '#2B2B2B', fontWeight: '500' }}>
+                        {currentTest.variable} × {currentTest.baseline}
+                      </div>
+                      <div style={{ fontSize: '0.875rem', color: '#4A5568', marginTop: '0.25rem' }}>
+                        Setting {currentTest.setting} of 10
+                      </div>
+                    </div>
+                  )}
+
+                  <div style={{ marginBottom: '0.5rem', color: '#2B2B2B', fontSize: '0.875rem' }}>
+                    Overall progress: {Math.round((progress.current / progress.total) * 100)}%
+                  </div>
+                  <div style={{ width: '100%', height: '12px', backgroundColor: '#E2E8F0', borderRadius: '6px', overflow: 'hidden' }}>
                     <div
                       style={{
                         width: `${(progress.current / progress.total) * 100}%`,
