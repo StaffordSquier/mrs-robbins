@@ -128,8 +128,10 @@ export default function BatchEvaluator() {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
-                text: baseline.text,
-                variables: { [variable.id]: setting },
+                baselineText: baseline.text,
+                config: {
+                  slots: [{ variableId: variable.id, value: setting }],
+                },
               }),
             });
 
