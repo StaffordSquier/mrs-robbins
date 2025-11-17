@@ -60,15 +60,14 @@ export async function POST(request: NextRequest) {
     );
 
     // Transcribe using Whisper
-    // When response_format is 'text', the API returns a string directly
+    // Using default JSON format to get properly typed response
     const transcription = await openai.audio.transcriptions.create({
       file: audioFile,
       model: 'whisper-1',
       language: 'en',
-      response_format: 'text',
     });
 
-    const transcriptText = transcription as string;
+    const transcriptText = transcription.text;
 
     // Update the database with the transcript
     const supabase = createServiceClient();
