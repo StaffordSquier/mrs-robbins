@@ -139,13 +139,14 @@ export default function BatchEvaluator() {
             });
 
             if (!response.ok) {
-              throw new Error(`Failed to generate output for ${variable.name} at setting ${setting}`);
+              const errorData = await response.json().catch(() => ({}));
+              throw new Error(`Failed to generate output for ${variable.name} at setting ${setting}: ${errorData.error || 'Unknown error'}`);
             }
 
             const data = await response.json();
             outputs.push({
               setting,
-              text: data.output,
+              text: data.output || '',
               delta: 0,
               effectiveness: 0,
             });
@@ -163,12 +164,15 @@ export default function BatchEvaluator() {
             });
 
             if (!scoreResponse.ok) {
-              throw new Error(`Failed to score output for ${variable.name}`);
+              const errorData = await scoreResponse.json().catch(() => ({}));
+              throw new Error(`Failed to score output for ${variable.name}: ${errorData.error || 'Unknown error'}`);
             }
 
             const scoreData = await scoreResponse.json();
-            output.delta = scoreData.delta;
-            output.effectiveness = scoreData.effectiveness;
+            // API returns { score, evidence } - score is 1-10 rating
+            // delta = actual score achieved, effectiveness = how close to target setting
+            output.delta = scoreData.score ?? 0;
+            output.effectiveness = output.setting > 0 ? (scoreData.score ?? 0) / output.setting : 0;
           }
 
           // Calculate statistics
@@ -200,16 +204,31 @@ export default function BatchEvaluator() {
     setCurrentTest(null);
   };
 
-  const Sparkline = ({ data }: { data: number[] }) => (
-    <svg width="60" height="24" style={{ display: 'block' }}>
-      <polyline
-        points={data.map((val, idx) => `${(idx / (data.length - 1)) * 60},${24 - (val / Math.max(...data)) * 24}`).join(' ')}
-        fill="none"
-        stroke="#2C7A7B"
-        strokeWidth="2"
-      />
-    </svg>
-  );
+  const Sparkline = ({ data }: { data: number[] }) => {
+    if (data.length === 0) {
+      return <svg width="60" height="24" style={{ display: 'block' }} />;
+    }
+
+    const maxVal = Math.max(...data);
+    const minVal = Math.min(...data);
+    const range = maxVal - minVal || 1; // Avoid division by zero
+    const xStep = data.length > 1 ? 60 / (data.length - 1) : 30;
+
+    return (
+      <svg width="60" height="24" style={{ display: 'block' }}>
+        <polyline
+          points={data.map((val, idx) => {
+            const x = data.length > 1 ? idx * xStep : 30;
+            const y = 22 - ((val - minVal) / range) * 20;
+            return `${x},${y}`;
+          }).join(' ')}
+          fill="none"
+          stroke="#2C7A7B"
+          strokeWidth="2"
+        />
+      </svg>
+    );
+  };
 
   return (
     <div style={{ minHeight: '100vh', backgroundColor: '#F7FAFC', padding: '2rem' }}>
@@ -497,12 +516,12 @@ export default function BatchEvaluator() {
                   )}
 
                   <div style={{ marginBottom: '0.5rem', color: '#2B2B2B', fontSize: '0.875rem' }}>
-                    Overall progress: {Math.round((progress.current / progress.total) * 100)}%
+                    Overall progress: {progress.total > 0 ? Math.round((progress.current / progress.total) * 100) : 0}%
                   </div>
                   <div style={{ width: '100%', height: '12px', backgroundColor: '#E2E8F0', borderRadius: '6px', overflow: 'hidden' }}>
                     <div
                       style={{
-                        width: `${(progress.current / progress.total) * 100}%`,
+                        width: `${progress.total > 0 ? (progress.current / progress.total) * 100 : 0}%`,
                         height: '100%',
                         backgroundColor: '#2C7A7B',
                         transition: 'width 0.3s',
@@ -535,8 +554,8 @@ export default function BatchEvaluator() {
                     </thead>
                     <tbody>
                       {results.map((result, idx) => {
-                        const avgDelta = result.outputs.reduce((sum, o) => sum + o.delta, 0) / result.outputs.length;
-                        const avgEffectiveness = result.outputs.reduce((sum, o) => sum + o.effectiveness, 0) / result.outputs.length;
+                        const avgDelta = result.outputs.length > 0 ? result.outputs.reduce((sum, o) => sum + o.delta, 0) / result.outputs.length : 0;
+                        const avgEffectiveness = result.outputs.length > 0 ? result.outputs.reduce((sum, o) => sum + o.effectiveness, 0) / result.outputs.length : 0;
                         return (
                           <tr key={idx} style={{ borderTop: '1px solid #E2E8F0' }}>
                             <td style={{ padding: '0.75rem', color: '#2B2B2B' }}>{result.variableName}</td>
@@ -873,13 +892,13 @@ export default function BatchEvaluator() {
                 <div style={{ padding: '1rem', backgroundColor: '#F7FAFC', borderRadius: '6px' }}>
                   <div style={{ fontSize: '0.875rem', color: '#4A5568', marginBottom: '0.25rem' }}>Avg Delta</div>
                   <div style={{ fontSize: '1.25rem', fontWeight: '600', color: '#2B2B2B' }}>
-                    {(selectedResult.outputs.reduce((sum, o) => sum + o.delta, 0) / selectedResult.outputs.length).toFixed(2)}
+                    {selectedResult.outputs.length > 0 ? (selectedResult.outputs.reduce((sum, o) => sum + o.delta, 0) / selectedResult.outputs.length).toFixed(2) : '0.00'}
                   </div>
                 </div>
                 <div style={{ padding: '1rem', backgroundColor: '#F7FAFC', borderRadius: '6px' }}>
                   <div style={{ fontSize: '0.875rem', color: '#4A5568', marginBottom: '0.25rem' }}>Avg Effectiveness</div>
                   <div style={{ fontSize: '1.25rem', fontWeight: '600', color: '#2B2B2B' }}>
-                    {(selectedResult.outputs.reduce((sum, o) => sum + o.effectiveness, 0) / selectedResult.outputs.length).toFixed(2)}
+                    {selectedResult.outputs.length > 0 ? (selectedResult.outputs.reduce((sum, o) => sum + o.effectiveness, 0) / selectedResult.outputs.length).toFixed(2) : '0.00'}
                   </div>
                 </div>
                 <div style={{ padding: '1rem', backgroundColor: '#F7FAFC', borderRadius: '6px' }}>
@@ -918,7 +937,7 @@ export default function BatchEvaluator() {
                           <td style={{ padding: '0.5rem', color: '#2B2B2B' }}>{output.delta.toFixed(2)}</td>
                           <td style={{ padding: '0.5rem', color: '#2B2B2B' }}>{output.effectiveness.toFixed(2)}</td>
                           <td style={{ padding: '0.5rem', fontSize: '0.875rem', color: '#2B2B2B' }}>
-                            {output.text.substring(0, 80)}...
+                            {output.text ? `${output.text.substring(0, 80)}${output.text.length > 80 ? '...' : ''}` : '(No output)'}
                           </td>
                         </tr>
                       ))}
