@@ -20,6 +20,12 @@ export default function VoiceCapture() {
   const [status, setStatus] = useState<string>('');
   const [error, setError] = useState<string>('');
 
+  // Project creation modal state
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [newProjectName, setNewProjectName] = useState('');
+  const [newProjectType, setNewProjectType] = useState('book');
+  const [isCreatingProject, setIsCreatingProject] = useState(false);
+
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
@@ -54,6 +60,49 @@ export default function VoiceCapture() {
       }
     } catch (err) {
       console.error('Failed to fetch projects:', err);
+    }
+  };
+
+  const createProject = async () => {
+    if (!newProjectName.trim()) {
+      setError('Project name is required');
+      return;
+    }
+
+    setIsCreatingProject(true);
+    setError('');
+
+    try {
+      const response = await fetch('/api/projects', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: newProjectName.trim(),
+          type: newProjectType,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || 'Failed to create project');
+      }
+
+      const data = await response.json();
+      const newProject = data.project;
+
+      // Update projects list and select the new project
+      setProjects(prev => [...prev, newProject]);
+      setSelectedProjectId(newProject.id);
+
+      // Close modal and reset form
+      setShowCreateModal(false);
+      setNewProjectName('');
+      setNewProjectType('book');
+      setStatus(`Project "${newProject.title}" created successfully!`);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to create project');
+    } finally {
+      setIsCreatingProject(false);
     }
   };
 
@@ -228,27 +277,66 @@ export default function VoiceCapture() {
           <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: '#2B2B2B' }}>
             Assign to Project
           </label>
-          <select
-            value={selectedProjectId}
-            onChange={(e) => setSelectedProjectId(e.target.value)}
-            disabled={isRecording || isUploading || isTranscribing}
-            style={{
-              width: '100%',
-              padding: '0.75rem',
-              border: '1px solid #E2E8F0',
-              borderRadius: '6px',
-              color: '#2B2B2B',
-              backgroundColor: 'white',
-              fontSize: '1rem',
-            }}
-          >
-            <option value="">Select a project...</option>
-            {projects.map(project => (
-              <option key={project.id} value={project.id}>
-                {project.title}
-              </option>
-            ))}
-          </select>
+
+          {projects.length === 0 ? (
+            <div>
+              <p style={{ color: '#718096', marginBottom: '1rem', fontSize: '0.875rem' }}>
+                No projects available. Create your first project to start recording.
+              </p>
+              <button
+                onClick={() => setShowCreateModal(true)}
+                disabled={isRecording || isUploading || isTranscribing}
+                style={{
+                  padding: '0.75rem 1.5rem',
+                  backgroundColor: '#2C7A7B',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '6px',
+                  cursor: (isRecording || isUploading || isTranscribing) ? 'not-allowed' : 'pointer',
+                  fontSize: '1rem',
+                  fontWeight: '500',
+                }}
+              >
+                + Create Project
+              </button>
+            </div>
+          ) : (
+            <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
+              <select
+                value={selectedProjectId}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  if (value === 'create-new') {
+                    setShowCreateModal(true);
+                    e.target.value = selectedProjectId;
+                  } else {
+                    setSelectedProjectId(value);
+                  }
+                }}
+                disabled={isRecording || isUploading || isTranscribing}
+                style={{
+                  flex: 1,
+                  padding: '0.75rem',
+                  border: '1px solid #E2E8F0',
+                  borderRadius: '6px',
+                  color: '#2B2B2B',
+                  backgroundColor: 'white',
+                  fontSize: '1rem',
+                }}
+              >
+                <option value="">Select a project...</option>
+                <option value="create-new" style={{ fontWeight: '600', color: '#2C7A7B' }}>
+                  + Create New Project
+                </option>
+                <option disabled>──────────</option>
+                {projects.map(project => (
+                  <option key={project.id} value={project.id}>
+                    {project.title}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
         </div>
 
         {/* Recording Controls */}
@@ -436,6 +524,133 @@ export default function VoiceCapture() {
           </div>
         )}
       </div>
+
+      {/* Create Project Modal */}
+      {showCreateModal && (
+        <div
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 1000,
+            padding: '1rem',
+          }}
+          onClick={() => !isCreatingProject && setShowCreateModal(false)}
+        >
+          <div
+            style={{
+              backgroundColor: 'white',
+              borderRadius: '8px',
+              padding: '2rem',
+              maxWidth: '500px',
+              width: '100%',
+              boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h2 style={{ fontSize: '1.5rem', fontWeight: '600', color: '#2B2B2B', marginBottom: '1.5rem' }}>
+              Create New Project
+            </h2>
+
+            <div style={{ marginBottom: '1.5rem' }}>
+              <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', color: '#2B2B2B', fontSize: '0.875rem' }}>
+                Project Name
+              </label>
+              <input
+                type="text"
+                value={newProjectName}
+                onChange={(e) => setNewProjectName(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && !isCreatingProject) {
+                    createProject();
+                  }
+                }}
+                placeholder="My Awesome Project"
+                disabled={isCreatingProject}
+                autoFocus
+                style={{
+                  width: '100%',
+                  padding: '0.75rem',
+                  border: '1px solid #E2E8F0',
+                  borderRadius: '6px',
+                  fontSize: '1rem',
+                  color: '#2B2B2B',
+                }}
+              />
+            </div>
+
+            <div style={{ marginBottom: '2rem' }}>
+              <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', color: '#2B2B2B', fontSize: '0.875rem' }}>
+                Project Type
+              </label>
+              <select
+                value={newProjectType}
+                onChange={(e) => setNewProjectType(e.target.value)}
+                disabled={isCreatingProject}
+                style={{
+                  width: '100%',
+                  padding: '0.75rem',
+                  border: '1px solid #E2E8F0',
+                  borderRadius: '6px',
+                  fontSize: '1rem',
+                  color: '#2B2B2B',
+                  backgroundColor: 'white',
+                }}
+              >
+                <option value="book">Book</option>
+                <option value="article">Article</option>
+                <option value="essay">Essay</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+
+            <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'flex-end' }}>
+              <button
+                onClick={() => {
+                  setShowCreateModal(false);
+                  setNewProjectName('');
+                  setNewProjectType('book');
+                }}
+                disabled={isCreatingProject}
+                style={{
+                  padding: '0.75rem 1.5rem',
+                  backgroundColor: '#E2E8F0',
+                  color: '#2B2B2B',
+                  border: 'none',
+                  borderRadius: '6px',
+                  cursor: isCreatingProject ? 'not-allowed' : 'pointer',
+                  fontSize: '1rem',
+                  fontWeight: '500',
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={createProject}
+                disabled={isCreatingProject || !newProjectName.trim()}
+                style={{
+                  padding: '0.75rem 1.5rem',
+                  backgroundColor: (isCreatingProject || !newProjectName.trim()) ? '#A0AEC0' : '#2C7A7B',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '6px',
+                  cursor: (isCreatingProject || !newProjectName.trim()) ? 'not-allowed' : 'pointer',
+                  fontSize: '1rem',
+                  fontWeight: '500',
+                }}
+              >
+                {isCreatingProject ? 'Creating...' : 'Create Project'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <style jsx>{`
         @keyframes pulse {
