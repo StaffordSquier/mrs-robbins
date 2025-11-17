@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createServiceClient, isSupabaseConfigured, Database } from '@/lib/supabase';
 import { v4 as uuidv4 } from 'uuid';
+import { getOrCreateDemoUser } from '@/lib/user-helper';
 
 type VoiceRecordingInsert = Database['public']['Tables']['voice_recordings']['Insert'];
 
@@ -70,8 +71,8 @@ export async function POST(request: NextRequest) {
 
     const audioUrl = urlData.publicUrl;
 
-    // For now, use a placeholder user ID (in production, get from auth)
-    const userId = 'user_placeholder';
+    // Get or create demo user
+    const userId = await getOrCreateDemoUser();
 
     // Save metadata to database
     const insertData: VoiceRecordingInsert = {

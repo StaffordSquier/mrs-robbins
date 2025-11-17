@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createServiceClient, isSupabaseConfigured, Database } from '@/lib/supabase';
 import { v4 as uuidv4 } from 'uuid';
+import { getOrCreateDemoUser } from '@/lib/user-helper';
 
 type ProjectInsert = Database['public']['Tables']['projects']['Insert'];
 
@@ -16,8 +17,8 @@ export async function GET() {
 
     const supabase = createServiceClient();
 
-    // For now, use a placeholder user ID (in production, get from auth)
-    const userId = 'user_placeholder';
+    // Get or create demo user
+    const userId = await getOrCreateDemoUser();
 
     const { data: projects, error } = await supabase
       .from('projects')
@@ -68,8 +69,8 @@ export async function POST(request: NextRequest) {
 
     const supabase = createServiceClient();
 
-    // For now, use a placeholder user ID (in production, get from auth)
-    const userId = 'user_placeholder';
+    // Get or create demo user
+    const userId = await getOrCreateDemoUser();
 
     const projectId = uuidv4();
 
