@@ -154,10 +154,8 @@ export default function BatchEvaluator() {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
-                original: baseline.text,
-                output: output.text,
+                outputText: output.text,
                 variable: variable.id,
-                setting: output.setting,
               }),
             });
 
