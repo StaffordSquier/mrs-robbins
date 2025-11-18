@@ -20,9 +20,11 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Initialize OpenAI client at runtime
+    // Initialize OpenAI client at runtime with timeout and no retries
     const openai = new OpenAI({
       apiKey: process.env.OPENAI_API_KEY,
+      timeout: 60000, // 60 second timeout
+      maxRetries: 0, // Don't retry on failure
     });
 
     const body = await request.json();
