@@ -449,8 +449,24 @@ export default function VoiceCapture() {
                   cursor: (!selectedProjectId || isUploading || isTranscribing) ? 'not-allowed' : 'pointer',
                   fontSize: '1rem',
                   fontWeight: '500',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '0.5rem',
                 }}
               >
+                {(isUploading || isTranscribing) && (
+                  <div
+                    style={{
+                      width: '16px',
+                      height: '16px',
+                      border: '2px solid rgba(255, 255, 255, 0.3)',
+                      borderTop: '2px solid white',
+                      borderRadius: '50%',
+                      animation: 'spin 0.8s linear infinite',
+                    }}
+                  />
+                )}
                 {isUploading ? 'Uploading...' : isTranscribing ? 'Transcribing...' : 'Upload & Transcribe'}
               </button>
               <button
@@ -656,6 +672,10 @@ export default function VoiceCapture() {
         @keyframes pulse {
           0%, 100% { opacity: 1; }
           50% { opacity: 0.5; }
+        }
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
         }
       `}</style>
     </div>
