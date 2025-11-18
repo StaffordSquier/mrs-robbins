@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createServiceClient, isSupabaseConfigured, Database } from '@/lib/supabase';
 import OpenAI from 'openai';
+import { eventBus, EVENTS, ContentCreatedEvent } from '@/lib/events';
+import '@/lib/init-events'; // Initialize event listeners
 
 type ThoughtBlobInsert = Database['public']['Tables']['thought_blobs']['Insert'];
 
@@ -113,7 +115,24 @@ export async function POST(request: NextRequest) {
       };
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      await (supabase as any).from('thought_blobs').insert(thoughtBlobData);
+      const { data: insertedBlob } = await (supabase as any)
+        .from('thought_blobs')
+        .insert(thoughtBlobData)
+        .select()
+        .single();
+
+      // Emit content created event for cataloging
+      if (insertedBlob) {
+        const contentCreatedEvent: ContentCreatedEvent = {
+          contentId: insertedBlob.id,
+          content: transcriptText,
+          contentType: 'thought_blob',
+          projectId: typedRecordingData.project_id,
+          userId: typedRecordingData.user_id,
+        };
+
+        await eventBus.emit(EVENTS.CONTENT_CREATED, contentCreatedEvent);
+      }
     }
 
     return NextResponse.json({
