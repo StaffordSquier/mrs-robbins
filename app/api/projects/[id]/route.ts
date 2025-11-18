@@ -3,7 +3,7 @@ import { createServiceClient, isSupabaseConfigured } from '@/lib/supabase';
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
     if (!isSupabaseConfigured) {
@@ -13,7 +13,7 @@ export async function GET(
       );
     }
 
-    const projectId = params.id;
+    const { id: projectId } = await context.params;
 
     if (!projectId) {
       return NextResponse.json(
