@@ -260,19 +260,39 @@ export default function VoiceCapture() {
   };
 
   return (
-    <div style={{ minHeight: '100vh', backgroundColor: '#F7FAFC', padding: '2rem' }}>
-      <div style={{ maxWidth: '800px', margin: '0 auto' }}>
-        <h1 style={{ fontSize: '2rem', fontWeight: 'bold', color: '#2B2B2B', marginBottom: '2rem' }}>
+    <div style={{
+      minHeight: '100vh',
+      backgroundColor: '#F7FAFC',
+      padding: '1rem',
+      boxSizing: 'border-box',
+      width: '100%',
+      overflowX: 'hidden'
+    }}>
+      <div style={{
+        maxWidth: '800px',
+        margin: '0 auto',
+        width: '100%',
+        boxSizing: 'border-box'
+      }}>
+        <h1 style={{
+          fontSize: 'clamp(1.5rem, 5vw, 2rem)',
+          fontWeight: 'bold',
+          color: '#2B2B2B',
+          marginBottom: '1.5rem',
+          wordBreak: 'break-word'
+        }}>
           Voice Capture
         </h1>
 
         {/* Project Selection */}
         <div style={{
-          padding: '1.5rem',
+          padding: 'clamp(1rem, 3vw, 1.5rem)',
           backgroundColor: 'white',
           border: '1px solid #E2E8F0',
           borderRadius: '8px',
-          marginBottom: '1.5rem'
+          marginBottom: '1.5rem',
+          boxSizing: 'border-box',
+          width: '100%'
         }}>
           <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: '#2B2B2B' }}>
             Assign to Project
@@ -341,16 +361,18 @@ export default function VoiceCapture() {
 
         {/* Recording Controls */}
         <div style={{
-          padding: '2rem',
+          padding: 'clamp(1rem, 4vw, 2rem)',
           backgroundColor: 'white',
           border: '1px solid #E2E8F0',
           borderRadius: '8px',
           marginBottom: '1.5rem',
-          textAlign: 'center'
+          textAlign: 'center',
+          boxSizing: 'border-box',
+          width: '100%'
         }}>
           {/* Recording Timer */}
           <div style={{
-            fontSize: '3rem',
+            fontSize: 'clamp(2rem, 8vw, 3rem)',
             fontWeight: '600',
             color: isRecording ? '#0D9488' : '#2B2B2B',
             marginBottom: '1.5rem',
@@ -385,15 +407,17 @@ export default function VoiceCapture() {
               onClick={startRecording}
               disabled={isUploading || isTranscribing || !!audioBlob}
               style={{
-                padding: '1rem 2rem',
+                padding: '1rem clamp(1rem, 4vw, 2rem)',
                 backgroundColor: audioBlob ? '#A0AEC0' : '#0D9488',
                 color: 'white',
                 border: 'none',
                 borderRadius: '8px',
                 cursor: audioBlob ? 'not-allowed' : 'pointer',
-                fontSize: '1.125rem',
+                fontSize: 'clamp(1rem, 3vw, 1.125rem)',
                 fontWeight: '600',
-                minWidth: '200px',
+                minWidth: 'min(200px, 90%)',
+                maxWidth: '100%',
+                boxSizing: 'border-box',
               }}
             >
               {audioBlob ? 'Recording Ready' : 'Record Voice Memo'}
@@ -402,15 +426,17 @@ export default function VoiceCapture() {
             <button
               onClick={stopRecording}
               style={{
-                padding: '1rem 2rem',
+                padding: '1rem clamp(1rem, 4vw, 2rem)',
                 backgroundColor: '#0D9488',
                 color: 'white',
                 border: 'none',
                 borderRadius: '8px',
                 cursor: 'pointer',
-                fontSize: '1.125rem',
+                fontSize: 'clamp(1rem, 3vw, 1.125rem)',
                 fontWeight: '600',
-                minWidth: '200px',
+                minWidth: 'min(200px, 90%)',
+                maxWidth: '100%',
+                boxSizing: 'border-box',
               }}
             >
               Stop & Save
@@ -421,11 +447,13 @@ export default function VoiceCapture() {
         {/* Audio Preview */}
         {audioUrl && (
           <div style={{
-            padding: '1.5rem',
+            padding: 'clamp(1rem, 3vw, 1.5rem)',
             backgroundColor: 'white',
             border: '1px solid #E2E8F0',
             borderRadius: '8px',
-            marginBottom: '1.5rem'
+            marginBottom: '1.5rem',
+            boxSizing: 'border-box',
+            width: '100%'
           }}>
             <h3 style={{ fontSize: '1rem', fontWeight: '600', color: '#2B2B2B', marginBottom: '1rem' }}>
               Recording Preview
@@ -498,6 +526,9 @@ export default function VoiceCapture() {
             borderRadius: '6px',
             marginBottom: '1rem',
             color: '#2B6CB0',
+            boxSizing: 'border-box',
+            width: '100%',
+            wordBreak: 'break-word',
           }}>
             {status}
           </div>
@@ -511,6 +542,9 @@ export default function VoiceCapture() {
             borderRadius: '6px',
             marginBottom: '1rem',
             color: '#C53030',
+            boxSizing: 'border-box',
+            width: '100%',
+            wordBreak: 'break-word',
           }}>
             {error}
           </div>
@@ -519,10 +553,12 @@ export default function VoiceCapture() {
         {/* Transcript Display */}
         {transcript && (
           <div style={{
-            padding: '1.5rem',
+            padding: 'clamp(1rem, 3vw, 1.5rem)',
             backgroundColor: 'white',
             border: '1px solid #E2E8F0',
             borderRadius: '8px',
+            boxSizing: 'border-box',
+            width: '100%'
           }}>
             <h3 style={{ fontSize: '1rem', fontWeight: '600', color: '#2B2B2B', marginBottom: '1rem' }}>
               Transcript
@@ -563,9 +599,10 @@ export default function VoiceCapture() {
             style={{
               backgroundColor: 'white',
               borderRadius: '8px',
-              padding: '2rem',
+              padding: 'clamp(1rem, 4vw, 2rem)',
               maxWidth: '500px',
               width: '100%',
+              boxSizing: 'border-box',
               boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
             }}
             onClick={(e) => e.stopPropagation()}

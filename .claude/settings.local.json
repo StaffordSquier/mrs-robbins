@@ -6,7 +6,8 @@
       "Bash(npm:*)",
       "Bash(chmod:*)",
       "Bash(./verify-db.sh:*)",
-      "Bash(curl:*)"
+      "Bash(curl:*)",
+      "Bash(./run-migration-003.sh:*)"
     ],
     "deny": [],
     "ask": []
