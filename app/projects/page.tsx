@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 
 interface Project {
   id: string;
@@ -21,6 +22,7 @@ const PROJECT_TYPES = [
 ];
 
 export default function ProjectsPage() {
+  const router = useRouter();
   const [projects, setProjects] = useState<Project[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string>('');
@@ -212,6 +214,7 @@ export default function ProjectsPage() {
                 </div>
                 <div style={{ display: 'flex', gap: '0.5rem' }}>
                   <button
+                    onClick={() => router.push(`/projects/${project.id}`)}
                     style={{
                       padding: '0.5rem 1rem',
                       backgroundColor: '#EDF2F7',
@@ -226,6 +229,7 @@ export default function ProjectsPage() {
                     View
                   </button>
                   <button
+                    onClick={() => router.push(`/projects/${project.id}`)}
                     style={{
                       padding: '0.5rem 1rem',
                       backgroundColor: '#0D9488',
