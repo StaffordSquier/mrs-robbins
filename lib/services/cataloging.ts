@@ -31,17 +31,37 @@ export interface ContentMatch {
  * Handles auto-categorization, embedding generation, and semantic search
  */
 export class CatalogingService {
-  private anthropic: Anthropic;
-  private openai: OpenAI;
+  private anthropic: Anthropic | null = null;
+  private openai: OpenAI | null = null;
 
-  constructor() {
-    this.anthropic = new Anthropic({
-      apiKey: process.env.ANTHROPIC_API_KEY,
-    });
+  /**
+   * Lazy initialization for Anthropic client (only created when needed)
+   */
+  private getAnthropic(): Anthropic {
+    if (!this.anthropic) {
+      if (!process.env.ANTHROPIC_API_KEY) {
+        throw new Error('ANTHROPIC_API_KEY environment variable is required');
+      }
+      this.anthropic = new Anthropic({
+        apiKey: process.env.ANTHROPIC_API_KEY,
+      });
+    }
+    return this.anthropic;
+  }
 
-    this.openai = new OpenAI({
-      apiKey: process.env.OPENAI_API_KEY,
-    });
+  /**
+   * Lazy initialization for OpenAI client (only created when needed)
+   */
+  private getOpenAI(): OpenAI {
+    if (!this.openai) {
+      if (!process.env.OPENAI_API_KEY) {
+        throw new Error('OPENAI_API_KEY environment variable is required');
+      }
+      this.openai = new OpenAI({
+        apiKey: process.env.OPENAI_API_KEY,
+      });
+    }
+    return this.openai;
   }
 
   /**
@@ -85,7 +105,9 @@ export class CatalogingService {
    * Extract 3-5 key concepts from content using Claude
    */
   private async extractConcepts(content: string): Promise<string[]> {
-    const message = await this.anthropic.messages.create({
+    const anthropic = this.getAnthropic();
+
+    const message = await anthropic.messages.create({
       model: 'claude-3-5-sonnet-20241022',
       max_tokens: 500,
       messages: [
@@ -234,9 +256,10 @@ Example output: ["love", "loss", "journey", "hope"]`,
   ): Promise<boolean> {
     try {
       const supabase = createServiceClient();
+      const openai = this.getOpenAI();
 
       // Generate embedding
-      const response = await this.openai.embeddings.create({
+      const response = await openai.embeddings.create({
         model: 'text-embedding-3-small',
         input: content,
       });
@@ -275,9 +298,10 @@ Example output: ["love", "loss", "journey", "hope"]`,
   ): Promise<ContentMatch[]> {
     try {
       const supabase = createServiceClient();
+      const openai = this.getOpenAI();
 
       // Generate query embedding
-      const response = await this.openai.embeddings.create({
+      const response = await openai.embeddings.create({
         model: 'text-embedding-3-small',
         input: query,
       });
