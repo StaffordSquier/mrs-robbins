@@ -4,7 +4,7 @@
 
 -- Insert vocabulary set
 INSERT INTO vocabulary_sets (id, name, description) VALUES
-  ('cw-vocab-001', 'Creative Writing', 'Comprehensive vocabulary for creative writing, including themes, emotions, literary elements, and sensory details');
+  ('00000000-0000-0000-0000-000000000001', 'Creative Writing', 'Comprehensive vocabulary for creative writing, including themes, emotions, literary elements, and sensory details');
 
 -- Helper function to get parent ID (temporary - for building hierarchy)
 -- Note: In production, you might want to insert in hierarchical order
@@ -15,39 +15,39 @@ INSERT INTO vocabulary_sets (id, name, description) VALUES
 
 -- Themes
 INSERT INTO controlled_vocabulary (id, vocabulary_set_id, term, parent_id, synonyms, description) VALUES
-  ('theme-root', 'cw-vocab-001', 'Themes', NULL, ARRAY['topics', 'subjects'], 'Central ideas and concepts in writing');
+  ('10000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-000000000001', 'Themes', NULL, ARRAY['topics', 'subjects'], 'Central ideas and concepts in writing');
 
 -- Emotions
 INSERT INTO controlled_vocabulary (id, vocabulary_set_id, term, parent_id, synonyms, description) VALUES
-  ('emotion-root', 'cw-vocab-001', 'Emotions', NULL, ARRAY['feelings', 'affect'], 'Emotional content and tone');
+  ('20000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-000000000001', 'Emotions', NULL, ARRAY['feelings', 'affect'], 'Emotional content and tone');
 
 -- Elements
 INSERT INTO controlled_vocabulary (id, vocabulary_set_id, term, parent_id, synonyms, description) VALUES
-  ('element-root', 'cw-vocab-001', 'Elements', NULL, ARRAY['devices', 'techniques'], 'Literary devices and techniques');
+  ('30000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-000000000001', 'Elements', NULL, ARRAY['devices', 'techniques'], 'Literary devices and techniques');
 
 -- Structure
 INSERT INTO controlled_vocabulary (id, vocabulary_set_id, term, parent_id, synonyms, description) VALUES
-  ('structure-root', 'cw-vocab-001', 'Structure', NULL, ARRAY['form', 'composition'], 'Organizational patterns and forms');
+  ('40000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-000000000001', 'Structure', NULL, ARRAY['form', 'composition'], 'Organizational patterns and forms');
 
 -- Sensory
 INSERT INTO controlled_vocabulary (id, vocabulary_set_id, term, parent_id, synonyms, description) VALUES
-  ('sensory-root', 'cw-vocab-001', 'Sensory', NULL, ARRAY['senses', 'perception'], 'Sensory details and imagery');
+  ('50000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-000000000001', 'Sensory', NULL, ARRAY['senses', 'perception'], 'Sensory details and imagery');
 
 -- =============================================================================
 -- THEMES - LEVEL 2
 -- =============================================================================
 
 INSERT INTO controlled_vocabulary (id, vocabulary_set_id, term, parent_id, synonyms, description) VALUES
-  ('theme-love', 'cw-vocab-001', 'Love', 'theme-root', ARRAY['affection', 'romance', 'devotion'], 'Expressions and experiences of love'),
-  ('theme-loss', 'cw-vocab-001', 'Loss', 'theme-root', ARRAY['grief', 'bereavement', 'absence'], 'Experiences of loss and grief'),
-  ('theme-hope', 'cw-vocab-001', 'Hope', 'theme-root', ARRAY['optimism', 'faith', 'aspiration'], 'Hopeful and aspirational content'),
-  ('theme-conflict', 'cw-vocab-001', 'Conflict', 'theme-root', ARRAY['struggle', 'tension', 'opposition'], 'Conflict and struggle'),
-  ('theme-journey', 'cw-vocab-001', 'Journey', 'theme-root', ARRAY['quest', 'voyage', 'travel'], 'Physical or metaphorical journeys'),
-  ('theme-identity', 'cw-vocab-001', 'Identity', 'theme-root', ARRAY['self', 'character', 'personality'], 'Questions of identity and self'),
-  ('theme-time', 'cw-vocab-001', 'Time', 'theme-root', ARRAY['temporality', 'duration', 'passage'], 'Time and its effects'),
-  ('theme-nature', 'cw-vocab-001', 'Nature', 'theme-root', ARRAY['natural world', 'environment', 'landscape'], 'Nature and the natural world'),
-  ('theme-memory', 'cw-vocab-001', 'Memory', 'theme-root', ARRAY['remembrance', 'recollection', 'nostalgia'], 'Memory and remembrance'),
-  ('theme-transformation', 'cw-vocab-001', 'Transformation', 'theme-root', ARRAY['change', 'metamorphosis', 'evolution'], 'Change and transformation');
+  ('10000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000001', 'Love', '10000000-0000-0000-0000-000000000000', ARRAY['affection', 'romance', 'devotion'], 'Expressions and experiences of love'),
+  ('10000000-0000-0000-0000-000000000002', '00000000-0000-0000-0000-000000000001', 'Loss', '10000000-0000-0000-0000-000000000000', ARRAY['grief', 'bereavement', 'absence'], 'Experiences of loss and grief'),
+  ('10000000-0000-0000-0000-000000000003', '00000000-0000-0000-0000-000000000001', 'Hope', '10000000-0000-0000-0000-000000000000', ARRAY['optimism', 'faith', 'aspiration'], 'Hopeful and aspirational content'),
+  ('10000000-0000-0000-0000-000000000004', '00000000-0000-0000-0000-000000000001', 'Conflict', '10000000-0000-0000-0000-000000000000', ARRAY['struggle', 'tension', 'opposition'], 'Conflict and struggle'),
+  ('10000000-0000-0000-0000-000000000005', '00000000-0000-0000-0000-000000000001', 'Journey', '10000000-0000-0000-0000-000000000000', ARRAY['quest', 'voyage', 'travel'], 'Physical or metaphorical journeys'),
+  ('10000000-0000-0000-0000-000000000006', '00000000-0000-0000-0000-000000000001', 'Identity', '10000000-0000-0000-0000-000000000000', ARRAY['self', 'character', 'personality'], 'Questions of identity and self'),
+  ('10000000-0000-0000-0000-000000000007', '00000000-0000-0000-0000-000000000001', 'Time', '10000000-0000-0000-0000-000000000000', ARRAY['temporality', 'duration', 'passage'], 'Time and its effects'),
+  ('10000000-0000-0000-0000-000000000008', '00000000-0000-0000-0000-000000000001', 'Nature', '10000000-0000-0000-0000-000000000000', ARRAY['natural world', 'environment', 'landscape'], 'Nature and the natural world'),
+  ('10000000-0000-0000-0000-000000000009', '00000000-0000-0000-0000-000000000001', 'Memory', '10000000-0000-0000-0000-000000000000', ARRAY['remembrance', 'recollection', 'nostalgia'], 'Memory and remembrance'),
+  ('10000000-0000-0000-0000-00000000000a', '00000000-0000-0000-0000-000000000001', 'Transformation', '10000000-0000-0000-0000-000000000000', ARRAY['change', 'metamorphosis', 'evolution'], 'Change and transformation');
 
 -- =============================================================================
 -- THEMES - LEVEL 3 (Sub-themes)
@@ -55,82 +55,82 @@ INSERT INTO controlled_vocabulary (id, vocabulary_set_id, term, parent_id, synon
 
 -- Love subtypes
 INSERT INTO controlled_vocabulary (id, vocabulary_set_id, term, parent_id, synonyms, description) VALUES
-  ('theme-love-romantic', 'cw-vocab-001', 'Romantic Love', 'theme-love', ARRAY['romance', 'passion', 'attraction'], 'Romantic and passionate love'),
-  ('theme-love-familial', 'cw-vocab-001', 'Familial Love', 'theme-love', ARRAY['family bonds', 'kinship'], 'Love between family members'),
-  ('theme-love-self', 'cw-vocab-001', 'Self-Love', 'theme-love', ARRAY['self-acceptance', 'self-compassion'], 'Love and acceptance of oneself'),
-  ('theme-love-platonic', 'cw-vocab-001', 'Platonic Love', 'theme-love', ARRAY['friendship', 'companionship'], 'Non-romantic love and friendship');
+  ('11000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000001', 'Romantic Love', '10000000-0000-0000-0000-000000000001', ARRAY['romance', 'passion', 'attraction'], 'Romantic and passionate love'),
+  ('11000000-0000-0000-0000-000000000002', '00000000-0000-0000-0000-000000000001', 'Familial Love', '10000000-0000-0000-0000-000000000001', ARRAY['family bonds', 'kinship'], 'Love between family members'),
+  ('11000000-0000-0000-0000-000000000003', '00000000-0000-0000-0000-000000000001', 'Self-Love', '10000000-0000-0000-0000-000000000001', ARRAY['self-acceptance', 'self-compassion'], 'Love and acceptance of oneself'),
+  ('11000000-0000-0000-0000-000000000004', '00000000-0000-0000-0000-000000000001', 'Platonic Love', '10000000-0000-0000-0000-000000000001', ARRAY['friendship', 'companionship'], 'Non-romantic love and friendship');
 
 -- Loss subtypes
 INSERT INTO controlled_vocabulary (id, vocabulary_set_id, term, parent_id, synonyms, description) VALUES
-  ('theme-loss-death', 'cw-vocab-001', 'Death', 'theme-loss', ARRAY['mortality', 'passing', 'dying'], 'Death and mortality'),
-  ('theme-loss-separation', 'cw-vocab-001', 'Separation', 'theme-loss', ARRAY['parting', 'distance', 'heartbreak'], 'Separation and distance'),
-  ('theme-loss-regret', 'cw-vocab-001', 'Regret', 'theme-loss', ARRAY['remorse', 'sorrow', 'guilt'], 'Regret and remorse'),
-  ('theme-loss-abandonment', 'cw-vocab-001', 'Abandonment', 'theme-loss', ARRAY['desertion', 'loneliness', 'isolation'], 'Being left or abandoned');
+  ('12000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000001', 'Death', '10000000-0000-0000-0000-000000000002', ARRAY['mortality', 'passing', 'dying'], 'Death and mortality'),
+  ('12000000-0000-0000-0000-000000000002', '00000000-0000-0000-0000-000000000001', 'Separation', '10000000-0000-0000-0000-000000000002', ARRAY['parting', 'distance', 'heartbreak'], 'Separation and distance'),
+  ('12000000-0000-0000-0000-000000000003', '00000000-0000-0000-0000-000000000001', 'Regret', '10000000-0000-0000-0000-000000000002', ARRAY['remorse', 'sorrow', 'guilt'], 'Regret and remorse'),
+  ('12000000-0000-0000-0000-000000000004', '00000000-0000-0000-0000-000000000001', 'Abandonment', '10000000-0000-0000-0000-000000000002', ARRAY['desertion', 'loneliness', 'isolation'], 'Being left or abandoned');
 
 -- Conflict subtypes
 INSERT INTO controlled_vocabulary (id, vocabulary_set_id, term, parent_id, synonyms, description) VALUES
-  ('theme-conflict-internal', 'cw-vocab-001', 'Internal Conflict', 'theme-conflict', ARRAY['inner struggle', 'self-conflict'], 'Internal psychological conflict'),
-  ('theme-conflict-external', 'cw-vocab-001', 'External Conflict', 'theme-conflict', ARRAY['interpersonal conflict', 'opposition'], 'Conflict with external forces');
+  ('14000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000001', 'Internal Conflict', '10000000-0000-0000-0000-000000000004', ARRAY['inner struggle', 'self-conflict'], 'Internal psychological conflict'),
+  ('14000000-0000-0000-0000-000000000002', '00000000-0000-0000-0000-000000000001', 'External Conflict', '10000000-0000-0000-0000-000000000004', ARRAY['interpersonal conflict', 'opposition'], 'Conflict with external forces');
 
 -- Journey subtypes
 INSERT INTO controlled_vocabulary (id, vocabulary_set_id, term, parent_id, synonyms, description) VALUES
-  ('theme-journey-physical', 'cw-vocab-001', 'Physical Journey', 'theme-journey', ARRAY['travel', 'voyage', 'trip'], 'Literal physical travel'),
-  ('theme-journey-emotional', 'cw-vocab-001', 'Emotional Journey', 'theme-journey', ARRAY['growth', 'development', 'transformation'], 'Emotional or psychological journey'),
-  ('theme-journey-spiritual', 'cw-vocab-001', 'Spiritual Journey', 'theme-journey', ARRAY['enlightenment', 'awakening'], 'Spiritual quest or awakening');
+  ('15000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000001', 'Physical Journey', '10000000-0000-0000-0000-000000000005', ARRAY['travel', 'voyage', 'trip'], 'Literal physical travel'),
+  ('15000000-0000-0000-0000-000000000002', '00000000-0000-0000-0000-000000000001', 'Emotional Journey', '10000000-0000-0000-0000-000000000005', ARRAY['growth', 'development', 'transformation'], 'Emotional or psychological journey'),
+  ('15000000-0000-0000-0000-000000000003', '00000000-0000-0000-0000-000000000001', 'Spiritual Journey', '10000000-0000-0000-0000-000000000005', ARRAY['enlightenment', 'awakening'], 'Spiritual quest or awakening');
 
 -- =============================================================================
 -- EMOTIONS - LEVEL 2
 -- =============================================================================
 
 INSERT INTO controlled_vocabulary (id, vocabulary_set_id, term, parent_id, synonyms, description) VALUES
-  ('emotion-joy', 'cw-vocab-001', 'Joy', 'emotion-root', ARRAY['happiness', 'delight', 'elation', 'bliss'], 'Feelings of joy and happiness'),
-  ('emotion-sadness', 'cw-vocab-001', 'Sadness', 'emotion-root', ARRAY['sorrow', 'melancholy', 'dejection'], 'Feelings of sadness'),
-  ('emotion-anger', 'cw-vocab-001', 'Anger', 'emotion-root', ARRAY['rage', 'fury', 'wrath'], 'Feelings of anger'),
-  ('emotion-fear', 'cw-vocab-001', 'Fear', 'emotion-root', ARRAY['anxiety', 'dread', 'terror', 'fright'], 'Feelings of fear'),
-  ('emotion-longing', 'cw-vocab-001', 'Longing', 'emotion-root', ARRAY['yearning', 'desire', 'craving'], 'Feelings of longing or desire'),
-  ('emotion-peace', 'cw-vocab-001', 'Peace', 'emotion-root', ARRAY['calm', 'tranquility', 'serenity'], 'Feelings of peace and calm'),
-  ('emotion-confusion', 'cw-vocab-001', 'Confusion', 'emotion-root', ARRAY['bewilderment', 'disorientation'], 'Feelings of confusion'),
-  ('emotion-excitement', 'cw-vocab-001', 'Excitement', 'emotion-root', ARRAY['enthusiasm', 'thrill', 'exhilaration'], 'Feelings of excitement'),
-  ('emotion-nostalgia', 'cw-vocab-001', 'Nostalgia', 'emotion-root', ARRAY['wistfulness', 'reminiscence'], 'Nostalgic feelings'),
-  ('emotion-wonder', 'cw-vocab-001', 'Wonder', 'emotion-root', ARRAY['awe', 'amazement', 'marvel'], 'Feelings of wonder and awe');
+  ('20000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000001', 'Joy', '20000000-0000-0000-0000-000000000000', ARRAY['happiness', 'delight', 'elation', 'bliss'], 'Feelings of joy and happiness'),
+  ('20000000-0000-0000-0000-000000000002', '00000000-0000-0000-0000-000000000001', 'Sadness', '20000000-0000-0000-0000-000000000000', ARRAY['sorrow', 'melancholy', 'dejection'], 'Feelings of sadness'),
+  ('20000000-0000-0000-0000-000000000003', '00000000-0000-0000-0000-000000000001', 'Anger', '20000000-0000-0000-0000-000000000000', ARRAY['rage', 'fury', 'wrath'], 'Feelings of anger'),
+  ('20000000-0000-0000-0000-000000000004', '00000000-0000-0000-0000-000000000001', 'Fear', '20000000-0000-0000-0000-000000000000', ARRAY['anxiety', 'dread', 'terror', 'fright'], 'Feelings of fear'),
+  ('20000000-0000-0000-0000-000000000005', '00000000-0000-0000-0000-000000000001', 'Longing', '20000000-0000-0000-0000-000000000000', ARRAY['yearning', 'desire', 'craving'], 'Feelings of longing or desire'),
+  ('20000000-0000-0000-0000-000000000006', '00000000-0000-0000-0000-000000000001', 'Peace', '20000000-0000-0000-0000-000000000000', ARRAY['calm', 'tranquility', 'serenity'], 'Feelings of peace and calm'),
+  ('20000000-0000-0000-0000-000000000007', '00000000-0000-0000-0000-000000000001', 'Confusion', '20000000-0000-0000-0000-000000000000', ARRAY['bewilderment', 'disorientation'], 'Feelings of confusion'),
+  ('20000000-0000-0000-0000-000000000008', '00000000-0000-0000-0000-000000000001', 'Excitement', '20000000-0000-0000-0000-000000000000', ARRAY['enthusiasm', 'thrill', 'exhilaration'], 'Feelings of excitement'),
+  ('20000000-0000-0000-0000-000000000009', '00000000-0000-0000-0000-000000000001', 'Nostalgia', '20000000-0000-0000-0000-000000000000', ARRAY['wistfulness', 'reminiscence'], 'Nostalgic feelings'),
+  ('20000000-0000-0000-0000-00000000000a', '00000000-0000-0000-0000-000000000001', 'Wonder', '20000000-0000-0000-0000-000000000000', ARRAY['awe', 'amazement', 'marvel'], 'Feelings of wonder and awe');
 
 -- =============================================================================
 -- ELEMENTS - LEVEL 2
 -- =============================================================================
 
 INSERT INTO controlled_vocabulary (id, vocabulary_set_id, term, parent_id, synonyms, description) VALUES
-  ('element-imagery', 'cw-vocab-001', 'Imagery', 'element-root', ARRAY['images', 'description', 'vivid language'], 'Descriptive imagery'),
-  ('element-metaphor', 'cw-vocab-001', 'Metaphor', 'element-root', ARRAY['figurative language', 'comparison'], 'Metaphorical language'),
-  ('element-symbolism', 'cw-vocab-001', 'Symbolism', 'element-root', ARRAY['symbols', 'symbolic meaning'], 'Use of symbols'),
-  ('element-narrative', 'cw-vocab-001', 'Narrative', 'element-root', ARRAY['storytelling', 'plot', 'story'], 'Narrative elements'),
-  ('element-dialogue', 'cw-vocab-001', 'Dialogue', 'element-root', ARRAY['conversation', 'speech'], 'Dialogue and conversation'),
-  ('element-voice', 'cw-vocab-001', 'Voice', 'element-root', ARRAY['perspective', 'point of view', 'narrator'], 'Narrative voice and perspective'),
-  ('element-rhythm', 'cw-vocab-001', 'Rhythm', 'element-root', ARRAY['cadence', 'flow', 'pace'], 'Rhythmic elements'),
-  ('element-repetition', 'cw-vocab-001', 'Repetition', 'element-root', ARRAY['refrain', 'echo'], 'Repetition for effect');
+  ('30000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000001', 'Imagery', '30000000-0000-0000-0000-000000000000', ARRAY['images', 'description', 'vivid language'], 'Descriptive imagery'),
+  ('30000000-0000-0000-0000-000000000002', '00000000-0000-0000-0000-000000000001', 'Metaphor', '30000000-0000-0000-0000-000000000000', ARRAY['figurative language', 'comparison'], 'Metaphorical language'),
+  ('30000000-0000-0000-0000-000000000003', '00000000-0000-0000-0000-000000000001', 'Symbolism', '30000000-0000-0000-0000-000000000000', ARRAY['symbols', 'symbolic meaning'], 'Use of symbols'),
+  ('30000000-0000-0000-0000-000000000004', '00000000-0000-0000-0000-000000000001', 'Narrative', '30000000-0000-0000-0000-000000000000', ARRAY['storytelling', 'plot', 'story'], 'Narrative elements'),
+  ('30000000-0000-0000-0000-000000000005', '00000000-0000-0000-0000-000000000001', 'Dialogue', '30000000-0000-0000-0000-000000000000', ARRAY['conversation', 'speech'], 'Dialogue and conversation'),
+  ('30000000-0000-0000-0000-000000000006', '00000000-0000-0000-0000-000000000001', 'Voice', '30000000-0000-0000-0000-000000000000', ARRAY['perspective', 'point of view', 'narrator'], 'Narrative voice and perspective'),
+  ('30000000-0000-0000-0000-000000000007', '00000000-0000-0000-0000-000000000001', 'Rhythm', '30000000-0000-0000-0000-000000000000', ARRAY['cadence', 'flow', 'pace'], 'Rhythmic elements'),
+  ('30000000-0000-0000-0000-000000000008', '00000000-0000-0000-0000-000000000001', 'Repetition', '30000000-0000-0000-0000-000000000000', ARRAY['refrain', 'echo'], 'Repetition for effect');
 
 -- =============================================================================
 -- STRUCTURE - LEVEL 2
 -- =============================================================================
 
 INSERT INTO controlled_vocabulary (id, vocabulary_set_id, term, parent_id, synonyms, description) VALUES
-  ('structure-verse', 'cw-vocab-001', 'Verse', 'structure-root', ARRAY['stanza', 'poetry'], 'Verse structure'),
-  ('structure-chorus', 'cw-vocab-001', 'Chorus', 'structure-root', ARRAY['refrain', 'repeated section'], 'Chorus or refrain'),
-  ('structure-bridge', 'cw-vocab-001', 'Bridge', 'structure-root', ARRAY['transition', 'connecting section'], 'Bridge or transition'),
-  ('structure-scene', 'cw-vocab-001', 'Scene', 'structure-root', ARRAY['setting', 'episode'], 'Scene or episode'),
-  ('structure-arc', 'cw-vocab-001', 'Arc', 'structure-root', ARRAY['progression', 'development'], 'Narrative arc'),
-  ('structure-fragment', 'cw-vocab-001', 'Fragment', 'structure-root', ARRAY['snippet', 'piece'], 'Fragmentary structure');
+  ('40000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000001', 'Verse', '40000000-0000-0000-0000-000000000000', ARRAY['stanza', 'poetry'], 'Verse structure'),
+  ('40000000-0000-0000-0000-000000000002', '00000000-0000-0000-0000-000000000001', 'Chorus', '40000000-0000-0000-0000-000000000000', ARRAY['refrain', 'repeated section'], 'Chorus or refrain'),
+  ('40000000-0000-0000-0000-000000000003', '00000000-0000-0000-0000-000000000001', 'Bridge', '40000000-0000-0000-0000-000000000000', ARRAY['transition', 'connecting section'], 'Bridge or transition'),
+  ('40000000-0000-0000-0000-000000000004', '00000000-0000-0000-0000-000000000001', 'Scene', '40000000-0000-0000-0000-000000000000', ARRAY['setting', 'episode'], 'Scene or episode'),
+  ('40000000-0000-0000-0000-000000000005', '00000000-0000-0000-0000-000000000001', 'Arc', '40000000-0000-0000-0000-000000000000', ARRAY['progression', 'development'], 'Narrative arc'),
+  ('40000000-0000-0000-0000-000000000006', '00000000-0000-0000-0000-000000000001', 'Fragment', '40000000-0000-0000-0000-000000000000', ARRAY['snippet', 'piece'], 'Fragmentary structure');
 
 -- =============================================================================
 -- SENSORY - LEVEL 2
 -- =============================================================================
 
 INSERT INTO controlled_vocabulary (id, vocabulary_set_id, term, parent_id, synonyms, description) VALUES
-  ('sensory-visual', 'cw-vocab-001', 'Visual', 'sensory-root', ARRAY['sight', 'seeing', 'visual imagery'], 'Visual descriptions'),
-  ('sensory-auditory', 'cw-vocab-001', 'Auditory', 'sensory-root', ARRAY['sound', 'hearing', 'acoustic'], 'Sound and hearing'),
-  ('sensory-tactile', 'cw-vocab-001', 'Tactile', 'sensory-root', ARRAY['touch', 'texture', 'feeling'], 'Touch and texture'),
-  ('sensory-olfactory', 'cw-vocab-001', 'Olfactory', 'sensory-root', ARRAY['smell', 'scent', 'aroma'], 'Smell and scent'),
-  ('sensory-gustatory', 'cw-vocab-001', 'Gustatory', 'sensory-root', ARRAY['taste', 'flavor'], 'Taste descriptions'),
-  ('sensory-kinesthetic', 'cw-vocab-001', 'Kinesthetic', 'sensory-root', ARRAY['movement', 'motion', 'bodily'], 'Movement and bodily sensations');
+  ('50000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000001', 'Visual', '50000000-0000-0000-0000-000000000000', ARRAY['sight', 'seeing', 'visual imagery'], 'Visual descriptions'),
+  ('50000000-0000-0000-0000-000000000002', '00000000-0000-0000-0000-000000000001', 'Auditory', '50000000-0000-0000-0000-000000000000', ARRAY['sound', 'hearing', 'acoustic'], 'Sound and hearing'),
+  ('50000000-0000-0000-0000-000000000003', '00000000-0000-0000-0000-000000000001', 'Tactile', '50000000-0000-0000-0000-000000000000', ARRAY['touch', 'texture', 'feeling'], 'Touch and texture'),
+  ('50000000-0000-0000-0000-000000000004', '00000000-0000-0000-0000-000000000001', 'Olfactory', '50000000-0000-0000-0000-000000000000', ARRAY['smell', 'scent', 'aroma'], 'Smell and scent'),
+  ('50000000-0000-0000-0000-000000000005', '00000000-0000-0000-0000-000000000001', 'Gustatory', '50000000-0000-0000-0000-000000000000', ARRAY['taste', 'flavor'], 'Taste descriptions'),
+  ('50000000-0000-0000-0000-000000000006', '00000000-0000-0000-0000-000000000001', 'Kinesthetic', '50000000-0000-0000-0000-000000000000', ARRAY['movement', 'motion', 'bodily'], 'Movement and bodily sensations');
 
 -- Create indexes for faster lookups
-CREATE INDEX IF NOT EXISTS idx_vocab_creative_writing ON controlled_vocabulary(vocabulary_set_id) WHERE vocabulary_set_id = 'cw-vocab-001';
+CREATE INDEX IF NOT EXISTS idx_vocab_creative_writing ON controlled_vocabulary(vocabulary_set_id) WHERE vocabulary_set_id = '00000000-0000-0000-0000-000000000001';
