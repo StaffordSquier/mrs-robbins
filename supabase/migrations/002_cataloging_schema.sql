@@ -2,6 +2,11 @@
 -- CATALOGING & EMBEDDING SCHEMA
 -- =============================================================================
 
+-- Drop tables that may exist from previous migration with old schema
+DROP TABLE IF EXISTS content_metadata CASCADE;
+DROP TABLE IF EXISTS controlled_vocabulary CASCADE;
+DROP TABLE IF EXISTS embeddings CASCADE;
+
 -- Vocabulary containers (supports multiple vocabularies)
 CREATE TABLE IF NOT EXISTS vocabulary_sets (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
