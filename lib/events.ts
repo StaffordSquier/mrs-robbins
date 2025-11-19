@@ -14,6 +14,14 @@ class EventBus {
       this.handlers.set(event, []);
     }
     this.handlers.get(event)!.push(handler);
+    console.log(`🔷 [EVENT_BUS] Registered handler for ${event} (total: ${this.handlers.get(event)!.length})`);
+  }
+
+  /**
+   * Get the number of handlers registered for an event
+   */
+  getHandlerCount(event: string): number {
+    return this.handlers.get(event)?.length || 0;
   }
 
   /**
