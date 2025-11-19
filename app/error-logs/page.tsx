@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { supabase as supabaseClient } from '@/lib/supabase';
 import Navigation from '@/components/Navigation';
 
 interface ErrorLog {
@@ -22,7 +22,7 @@ export default function ErrorLogsPage() {
   const [errorLogs, setErrorLogs] = useState<ErrorLog[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<'all' | 'error' | 'warning'>('all');
-  const supabase = createClientComponentClient();
+  const [error, setError] = useState<string>('');
 
   useEffect(() => {
     loadErrorLogs();
@@ -30,8 +30,16 @@ export default function ErrorLogsPage() {
 
   async function loadErrorLogs() {
     setLoading(true);
+    setError('');
+
+    if (!supabaseClient) {
+      setError('Supabase is not configured');
+      setLoading(false);
+      return;
+    }
+
     try {
-      let query = supabase
+      let query = supabaseClient
         .from('error_logs')
         .select('*')
         .order('created_at', { ascending: false })
@@ -41,16 +49,18 @@ export default function ErrorLogsPage() {
         query = query.eq('severity', filter);
       }
 
-      const { data, error } = await query;
+      const { data, error: queryError } = await query;
 
-      if (error) {
-        console.error('Error loading logs:', error);
+      if (queryError) {
+        console.error('Error loading logs:', queryError);
+        setError(queryError.message || 'Failed to load error logs');
         return;
       }
 
       setErrorLogs(data as ErrorLog[] || []);
     } catch (err) {
       console.error('Failed to load error logs:', err);
+      setError(err instanceof Error ? err.message : 'Failed to load error logs');
     } finally {
       setLoading(false);
     }
@@ -122,6 +132,14 @@ export default function ErrorLogsPage() {
             Refresh
           </button>
         </div>
+
+        {/* Error Message */}
+        {error && (
+          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6">
+            <p className="font-bold">Error</p>
+            <p>{error}</p>
+          </div>
+        )}
 
         {/* Error Logs Table */}
         {loading ? (
