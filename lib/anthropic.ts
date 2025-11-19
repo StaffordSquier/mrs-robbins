@@ -12,6 +12,9 @@ let anthropicClient: Anthropic | null = null;
  */
 export function getAnthropicClient(): Anthropic {
   if (!anthropicClient) {
+    if (!process.env.ANTHROPIC_API_KEY) {
+      throw new Error('ANTHROPIC_API_KEY environment variable is not set');
+    }
     anthropicClient = new Anthropic({
       apiKey: process.env.ANTHROPIC_API_KEY,
     });
