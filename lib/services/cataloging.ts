@@ -1,6 +1,7 @@
 import Anthropic from '@anthropic-ai/sdk';
 import OpenAI from 'openai';
 import { createServiceClient } from '../supabase';
+import { logError } from '../error-logger';
 
 export interface CatalogResult {
   contentId: string;
@@ -74,19 +75,113 @@ export class CatalogingService {
     vocabularySetId?: string
   ): Promise<CatalogResult> {
     try {
+      console.log(`🔷 [CATALOGING_SERVICE] Starting categorization for ${contentId}`);
+      console.log(`🔷 [CATALOGING_SERVICE] Content length: ${content.length} chars, type: ${contentType}`);
+
       // Step 1: Extract key concepts using Claude
-      const concepts = await this.extractConcepts(content);
+      console.log(`🔷 [CATALOGING_SERVICE] Step 1: Extracting concepts with Claude...`);
+      let concepts: string[] = [];
+      try {
+        concepts = await this.extractConcepts(content);
+        console.log(`🔷 [CATALOGING_SERVICE] Extracted ${concepts.length} concepts:`, concepts);
+      } catch (conceptError) {
+        await logError({
+          errorType: 'cataloging',
+          severity: 'error',
+          contentId,
+          contentType,
+          operation: 'extractConcepts',
+          errorMessage: conceptError instanceof Error ? conceptError.message : String(conceptError),
+          errorStack: conceptError instanceof Error ? conceptError.stack : undefined,
+          errorData: { contentLength: content.length },
+        });
+        throw conceptError;
+      }
 
       // Step 2: Map concepts to vocabulary terms
-      const matches = await this.mapToVocabulary(concepts, vocabularySetId);
+      console.log(`🔷 [CATALOGING_SERVICE] Step 2: Mapping concepts to vocabulary...`);
+      let matches: any[] = [];
+      try {
+        matches = await this.mapToVocabulary(concepts, vocabularySetId);
+        console.log(`🔷 [CATALOGING_SERVICE] Found ${matches.length} vocabulary matches`);
+
+        if (matches.length === 0) {
+          await logError({
+            errorType: 'cataloging',
+            severity: 'warning',
+            contentId,
+            contentType,
+            operation: 'mapToVocabulary',
+            errorMessage: 'No vocabulary matches found for extracted concepts',
+            errorData: { concepts, vocabularySetId },
+          });
+        }
+      } catch (mappingError) {
+        await logError({
+          errorType: 'cataloging',
+          severity: 'error',
+          contentId,
+          contentType,
+          operation: 'mapToVocabulary',
+          errorMessage: mappingError instanceof Error ? mappingError.message : String(mappingError),
+          errorStack: mappingError instanceof Error ? mappingError.stack : undefined,
+          errorData: { concepts, vocabularySetId },
+        });
+        throw mappingError;
+      }
 
       // Step 3: Store metadata in database
-      await this.storeMetadata(contentId, contentType, matches);
+      console.log(`🔷 [CATALOGING_SERVICE] Step 3: Storing metadata in database...`);
+      try {
+        await this.storeMetadata(contentId, contentType, matches);
+        console.log(`✅ [CATALOGING_SERVICE] Metadata stored successfully`);
+      } catch (storeError) {
+        await logError({
+          errorType: 'cataloging',
+          severity: 'error',
+          contentId,
+          contentType,
+          operation: 'storeMetadata',
+          errorMessage: storeError instanceof Error ? storeError.message : String(storeError),
+          errorStack: storeError instanceof Error ? storeError.stack : undefined,
+          errorData: { matchCount: matches.length, matches },
+        });
+        throw storeError;
+      }
 
       // Step 4: Generate and store embedding
-      const embeddingGenerated = await this.generateEmbedding(contentId, content, contentType);
+      console.log(`🔷 [CATALOGING_SERVICE] Step 4: Generating embedding...`);
+      let embeddingGenerated = false;
+      try {
+        embeddingGenerated = await this.generateEmbedding(contentId, content, contentType);
+        console.log(`✅ [CATALOGING_SERVICE] Embedding ${embeddingGenerated ? 'generated' : 'failed'}`);
 
-      return {
+        if (!embeddingGenerated) {
+          await logError({
+            errorType: 'cataloging',
+            severity: 'warning',
+            contentId,
+            contentType,
+            operation: 'generateEmbedding',
+            errorMessage: 'Embedding generation returned false',
+            errorData: { contentLength: content.length },
+          });
+        }
+      } catch (embeddingError) {
+        await logError({
+          errorType: 'cataloging',
+          severity: 'warning',
+          contentId,
+          contentType,
+          operation: 'generateEmbedding',
+          errorMessage: embeddingError instanceof Error ? embeddingError.message : String(embeddingError),
+          errorStack: embeddingError instanceof Error ? embeddingError.stack : undefined,
+          errorData: { contentLength: content.length },
+        });
+        // Don't throw - embedding failure shouldn't break cataloging
+      }
+
+      const result = {
         contentId,
         terms: matches.map(m => ({
           termId: m.termId,
@@ -95,8 +190,11 @@ export class CatalogingService {
         })),
         embeddingGenerated,
       };
+
+      console.log(`✅ [CATALOGING_SERVICE] Categorization complete for ${contentId}`);
+      return result;
     } catch (error) {
-      console.error('Categorization error:', error);
+      console.error(`❌ [CATALOGING_SERVICE] Categorization error for ${contentId}:`, error);
       throw error;
     }
   }
@@ -233,16 +331,25 @@ Example output: ["love", "loss", "journey", "hope"]`,
       confidence: match.confidence,
     }));
 
+    console.log(`🔷 [STORE_METADATA] Preparing to insert ${metadata.length} metadata records`);
+
     if (metadata.length > 0) {
+      console.log(`🔷 [STORE_METADATA] Inserting metadata for content ${contentId}:`, metadata);
+
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { error } = await (supabase as any)
+      const { error, data } = await (supabase as any)
         .from('content_metadata')
-        .insert(metadata);
+        .insert(metadata)
+        .select();
 
       if (error) {
-        console.error('Error storing metadata:', error);
+        console.error(`❌ [STORE_METADATA] Error storing metadata:`, error);
         throw error;
       }
+
+      console.log(`✅ [STORE_METADATA] Successfully inserted ${data?.length || metadata.length} records`);
+    } else {
+      console.log(`⚠️  [STORE_METADATA] No vocabulary matches found - no metadata to store`);
     }
   }
 

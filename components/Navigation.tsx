@@ -12,6 +12,7 @@ const navLinks = [
   { href: '/avatar-tuner', label: 'Avatar Tuner' },
   { href: '/avatar-evaluator', label: 'Avatar Evaluator' },
   { href: '/batch-evaluator', label: 'Batch Evaluator' },
+  { href: '/error-logs', label: 'Error Logs' },
 ];
 
 export default function Navigation() {

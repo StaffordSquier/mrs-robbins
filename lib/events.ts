@@ -23,15 +23,18 @@ class EventBus {
   async emit(event: string, data: any) {
     const handlers = this.handlers.get(event) || [];
 
+    console.log(`🔷 [EVENT_BUS] Emitting event: ${event}, handlers registered: ${handlers.length}`);
+
     if (handlers.length === 0) {
-      console.warn(`No handlers registered for event: ${event}`);
+      console.warn(`❌ [EVENT_BUS] No handlers registered for event: ${event}`);
       return;
     }
 
     try {
       await Promise.all(handlers.map(h => h(data)));
+      console.log(`✅ [EVENT_BUS] All handlers for ${event} completed successfully`);
     } catch (error) {
-      console.error(`Error emitting event ${event}:`, error);
+      console.error(`❌ [EVENT_BUS] Error emitting event ${event}:`, error);
       throw error;
     }
   }

@@ -123,6 +123,8 @@ export async function POST(request: NextRequest) {
 
       // Emit content created event for cataloging
       if (insertedBlob) {
+        console.log(`🔷 [TRANSCRIBE] Created thought_blob with ID: ${insertedBlob.id}`);
+
         const contentCreatedEvent: ContentCreatedEvent = {
           contentId: insertedBlob.id,
           content: transcriptText,
@@ -131,7 +133,9 @@ export async function POST(request: NextRequest) {
           userId: typedRecordingData.user_id,
         };
 
+        console.log(`🔷 [TRANSCRIBE] Emitting CONTENT_CREATED event for blob ${insertedBlob.id}`);
         await eventBus.emit(EVENTS.CONTENT_CREATED, contentCreatedEvent);
+        console.log(`🔷 [TRANSCRIBE] Event emitted successfully for blob ${insertedBlob.id}`);
       }
     }
 

@@ -7,7 +7,10 @@
       "Bash(chmod:*)",
       "Bash(./verify-db.sh:*)",
       "Bash(curl:*)",
-      "Bash(./run-migration-003.sh:*)"
+      "Bash(./run-migration-003.sh:*)",
+      "Bash(node -e:*)",
+      "Bash(npx tsx:*)",
+      "Bash(NEXT_PUBLIC_SUPABASE_URL=\"https://lugkwarvllyhpzqklisv.supabase.co\" NEXT_PUBLIC_SUPABASE_ANON_KEY=\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx1Z2t3YXJ2bGx5aHB6cWtsaXN2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI2MjU1MzksImV4cCI6MjA3ODIwMTUzOX0.kVtDUi2spMXJbwOCR0_9In9b7mIFwYw1y-zA5JAye38\" npx tsx:*)"
     ],
     "deny": [],
     "ask": []
