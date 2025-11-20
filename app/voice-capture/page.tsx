@@ -190,6 +190,9 @@ export default function VoiceCapture() {
       formData.append('projectId', selectedProjectId);
       formData.append('durationSeconds', recordingTime.toString());
 
+      console.log('Sending FormData:', formData);
+      console.log('FormData entries:', Array.from(formData.entries()));
+
       const response = await fetch('/api/voice/transcribe', {
         method: 'POST',
         body: formData,
