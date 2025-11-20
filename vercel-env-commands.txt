@@ -1,0 +1,36 @@
+# Vercel Environment Variables - Manual Setup Commands
+# Copy-paste these commands one at a time
+
+# First, login and link your project (if you haven't already):
+vercel login
+vercel link
+
+# Add NEXT_PUBLIC_SUPABASE_URL
+vercel env add NEXT_PUBLIC_SUPABASE_URL production preview development
+# When prompted, paste: https://lugkwarvllyhpzqklisv.supabase.co
+
+# Add NEXT_PUBLIC_SUPABASE_ANON_KEY
+vercel env add NEXT_PUBLIC_SUPABASE_ANON_KEY production preview development
+# When prompted, paste: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx1Z2t3YXJ2bGx5aHB6cWtsaXN2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI2MjU1MzksImV4cCI6MjA3ODIwMTUzOX0.kVtDUi2spMXJbwOCR0_9In9b7mIFwYw1y-zA5JAye38
+
+# Add SUPABASE_SERVICE_ROLE_KEY
+vercel env add SUPABASE_SERVICE_ROLE_KEY production preview development
+# When prompted, paste: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx1Z2t3YXJ2bGx5aHB6cWtsaXN2Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2MjYyNTUzOSwiZXhwIjoyMDc4MjAxNTM5fQ.8IdYv-5vqGtXuh4GRSRPChv6e5qhN3HXYG3b04afqSI
+
+# Add ANTHROPIC_API_KEY
+vercel env add ANTHROPIC_API_KEY production preview development
+# When prompted, paste: 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
+
+# Verify all variables were added
+vercel env ls
+
+# Deploy to production
+vercel --prod
+
+# After first deploy, get your deployment URL (e.g., https://mrs-robbins.vercel.app)
+# Then add NEXT_PUBLIC_APP_URL:
+vercel env add NEXT_PUBLIC_APP_URL production preview development
+# When prompted, paste your deployment URL (e.g., https://mrs-robbins.vercel.app)
+
+# Redeploy with updated URL
+vercel --prod

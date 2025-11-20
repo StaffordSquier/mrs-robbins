@@ -1,24 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createServiceClient, isSupabaseConfigured, Database } from '@/lib/supabase';
 import OpenAI from 'openai';
-import { eventBus, EVENTS, ContentCreatedEvent } from '@/lib/events';
-import { initializeEventListeners } from '@/lib/init-events';
+import { catalogingService } from '@/lib/services/cataloging';
 
 type ThoughtBlobInsert = Database['public']['Tables']['thought_blobs']['Insert'];
 
 export async function POST(request: NextRequest) {
-  // CRITICAL: Explicitly initialize event listeners in serverless context
-  // This ensures cataloging handlers are registered before we emit events
-  initializeEventListeners();
-
-  // Verify handlers are registered
-  const handlerCount = eventBus.getHandlerCount(EVENTS.CONTENT_CREATED);
-  console.log(`🔷 [TRANSCRIBE] Event listeners initialized. CONTENT_CREATED handlers: ${handlerCount}`);
-
-  if (handlerCount === 0) {
-    console.error('❌ [TRANSCRIBE] WARNING: No handlers registered for CONTENT_CREATED event!');
-  }
-
   try {
     if (!isSupabaseConfigured) {
       return NextResponse.json(
@@ -133,31 +120,23 @@ export async function POST(request: NextRequest) {
         .select()
         .single();
 
-      // Emit content created event for cataloging
+      // Directly call cataloging service after blob is inserted
       if (insertedBlob) {
         console.log(`🔷 [TRANSCRIBE] Created thought_blob with ID: ${insertedBlob.id}`);
 
-        const contentCreatedEvent: ContentCreatedEvent = {
-          contentId: insertedBlob.id,
-          content: transcriptText,
-          contentType: 'thought_blob',
-          projectId: typedRecordingData.project_id,
-          userId: typedRecordingData.user_id,
-        };
-
         try {
-          console.log(`🔷 [TRANSCRIBE] Emitting CONTENT_CREATED event for blob ${insertedBlob.id}`);
-          console.log(`🔷 [TRANSCRIBE] Event data:`, {
-            contentId: contentCreatedEvent.contentId,
-            contentLength: contentCreatedEvent.content.length,
-            contentType: contentCreatedEvent.contentType,
-          });
+          console.log(`🔷 [TRANSCRIBE] Starting cataloging for blob ${insertedBlob.id}`);
 
-          await eventBus.emit(EVENTS.CONTENT_CREATED, contentCreatedEvent);
-          console.log(`✅ [TRANSCRIBE] Event emitted and all handlers completed for blob ${insertedBlob.id}`);
-        } catch (eventError) {
-          console.error(`❌ [TRANSCRIBE] Event emission failed for blob ${insertedBlob.id}:`, eventError);
-          console.error('Event error details:', eventError instanceof Error ? eventError.stack : eventError);
+          await catalogingService.categorize(
+            insertedBlob.id,
+            transcriptText,
+            'thought_blob'
+          );
+
+          console.log(`✅ [TRANSCRIBE] Successfully cataloged blob ${insertedBlob.id}`);
+        } catch (catalogError) {
+          console.error(`❌ [TRANSCRIBE] Cataloging failed for blob ${insertedBlob.id}:`, catalogError);
+          console.error('Cataloging error details:', catalogError instanceof Error ? catalogError.stack : catalogError);
           // Don't throw - cataloging failure shouldn't break transcription
         }
       } else {
