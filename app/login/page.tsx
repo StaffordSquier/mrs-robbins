@@ -1,8 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { getSupabaseClient } from '@/lib/supabase';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -10,6 +10,8 @@ export default function Login() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirectTo = searchParams.get('redirectTo') || '/voice-capture';
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -27,12 +29,14 @@ export default function Login() {
         throw signInError;
       }
 
-      if (data.user) {
-        router.push('/voice-capture');
+      if (data.session) {
+        // Wait a moment for session to be fully set
+        await new Promise(resolve => setTimeout(resolve, 100));
+        router.push(redirectTo);
+        router.refresh();
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to sign in');
-    } finally {
       setIsLoading(false);
     }
   };
