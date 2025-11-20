@@ -254,9 +254,22 @@ Example output: ["love", "loss", "journey", "hope"]`,
       query = query.eq('vocabulary_set_id', vocabularySetId);
     }
 
-    const { data: terms } = await query;
+    const { data: terms, error: queryError } = await query;
 
-    if (!terms) return matches;
+    console.log(`🔍 [MAP_TO_VOCABULARY] Query result:`, { termsCount: terms?.length || 0, error: queryError });
+
+    if (queryError) {
+      console.error(`❌ [MAP_TO_VOCABULARY] Database query error:`, queryError);
+      return matches;
+    }
+
+    if (!terms || terms.length === 0) {
+      console.warn(`⚠️  [MAP_TO_VOCABULARY] No vocabulary terms found in database!`);
+      return matches;
+    }
+
+    console.log(`✅ [MAP_TO_VOCABULARY] Found ${terms.length} vocabulary terms in database`);
+    console.log(`📋 [MAP_TO_VOCABULARY] Sample terms:`, terms.slice(0, 5).map((t: any) => t.term));
 
     // Type assertion for vocabulary terms
     const typedTerms = terms as Array<{
@@ -267,12 +280,14 @@ Example output: ["love", "loss", "journey", "hope"]`,
     }>;
 
     // Match concepts to vocabulary terms
+    console.log(`🔍 [MAP_TO_VOCABULARY] Attempting to match concepts:`, concepts);
     for (const concept of concepts) {
       const conceptLower = concept.toLowerCase();
 
       // Try exact match
       const exactMatch = typedTerms.find(t => t.term.toLowerCase() === conceptLower);
       if (exactMatch) {
+        console.log(`✅ [MAP_TO_VOCABULARY] EXACT MATCH: "${concept}" → "${exactMatch.term}" (ID: ${exactMatch.id})`);
         matches.push({
           termId: exactMatch.id,
           term: exactMatch.term,
@@ -308,7 +323,14 @@ Example output: ["love", "loss", "journey", "hope"]`,
           confidence: 0.70,
           matchType: 'parent',
         });
+      } else {
+        console.log(`⚠️  [MAP_TO_VOCABULARY] No match found for concept: "${concept}"`);
       }
+    }
+
+    console.log(`📊 [MAP_TO_VOCABULARY] Final result: ${matches.length} matches found`);
+    if (matches.length > 0) {
+      console.log(`📋 [MAP_TO_VOCABULARY] Matches:`, matches.map(m => `${m.term} (${m.termId})`));
     }
 
     return matches;
