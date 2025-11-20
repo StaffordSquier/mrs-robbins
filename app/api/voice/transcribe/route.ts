@@ -68,7 +68,7 @@ export async function POST(request: NextRequest) {
     // Upload audio to Supabase Storage
     const fileName = `${userId}/${Date.now()}-recording.webm`;
     const { data: uploadData, error: uploadError } = await supabase.storage
-      .from('voice-recordings')
+      .from('voice-memos')
       .upload(fileName, audioFile, {
         contentType: audioFile.type,
         upsert: false,
@@ -84,7 +84,7 @@ export async function POST(request: NextRequest) {
 
     // Get public URL for the uploaded file
     const { data: { publicUrl } } = supabase.storage
-      .from('voice-recordings')
+      .from('voice-memos')
       .getPublicUrl(fileName);
 
     // Create voice recording record
