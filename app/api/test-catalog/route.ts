@@ -62,8 +62,9 @@ async function testCataloging(text: string) {
       result.vocabularyCheck.error = vocabError.message;
       console.error('❌ [TEST_CATALOG] Vocabulary check failed:', vocabError);
     } else {
+      const typedVocabTerms = vocabTerms as Array<{ id: string; term: string }> | null;
       result.vocabularyCheck.count = count;
-      result.vocabularyCheck.sampleTerms = vocabTerms?.map(t => t.term) || [];
+      result.vocabularyCheck.sampleTerms = typedVocabTerms?.map(t => t.term) || [];
       console.log(`✅ [TEST_CATALOG] Found ${count} vocabulary terms`);
       console.log(`📋 [TEST_CATALOG] Sample terms:`, result.vocabularyCheck.sampleTerms);
     }
