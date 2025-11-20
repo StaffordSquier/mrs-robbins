@@ -98,7 +98,8 @@ export async function POST(request: NextRequest) {
         );
       }
 
-      content = blob.content;
+      const typedBlob = blob as { id: string; content: string };
+      content = typedBlob.content;
     } else {
       // Generate a test blob ID for test content
       contentId = 'test-' + Date.now();
