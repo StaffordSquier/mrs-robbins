@@ -62,18 +62,11 @@ export async function POST(request: NextRequest) {
 
     const supabase = createServiceClient();
 
-    // Get user ID from session (you may need to adjust this based on your auth setup)
-    const { data: { user } } = await supabase.auth.getUser();
-
-    if (!user) {
-      return NextResponse.json(
-        { error: 'User not authenticated' },
-        { status: 401 }
-      );
-    }
+    // Hardcoded test user for MVP
+    const userId = 'test-user-123';
 
     // Upload audio to Supabase Storage
-    const fileName = `${user.id}/${Date.now()}-recording.webm`;
+    const fileName = `${userId}/${Date.now()}-recording.webm`;
     const { data: uploadData, error: uploadError } = await supabase.storage
       .from('voice-recordings')
       .upload(fileName, audioFile, {
@@ -100,7 +93,7 @@ export async function POST(request: NextRequest) {
       .from('voice_recordings')
       .insert({
         project_id: projectId,
-        user_id: user.id,
+        user_id: userId,
         audio_url: publicUrl,
         duration_seconds: parseInt(durationSeconds) || 0,
         transcript: transcriptText,
