@@ -62,8 +62,9 @@ export async function POST(request: NextRequest) {
 
     const supabase = createServiceClient();
 
-    // Hardcoded test user for MVP
-    const userId = '00000000-0000-0000-0000-000000000000';
+    // Get authenticated user ID or fallback to test user
+    const { data: { user } } = await supabase.auth.getUser();
+    const userId = user?.id || '00000000-0000-0000-0000-000000000000';
 
     // Upload audio to Supabase Storage
     const fileName = `${userId}/${Date.now()}-recording.webm`;
