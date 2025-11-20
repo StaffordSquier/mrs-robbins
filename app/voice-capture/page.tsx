@@ -179,50 +179,30 @@ export default function VoiceCapture() {
       return;
     }
 
-    setIsUploading(true);
+    setIsTranscribing(true);
     setError('');
-    setStatus('Uploading audio...');
+    setStatus('Uploading and transcribing...');
 
     try {
-      // Upload audio
+      // Send audio directly to transcribe endpoint
       const formData = new FormData();
       formData.append('audio', audioBlob, 'recording.webm');
       formData.append('projectId', selectedProjectId);
       formData.append('durationSeconds', recordingTime.toString());
 
-      const uploadResponse = await fetch('/api/voice/upload', {
+      const response = await fetch('/api/voice/transcribe', {
         method: 'POST',
         body: formData,
       });
 
-      if (!uploadResponse.ok) {
-        const errorData = await uploadResponse.json().catch(() => ({}));
-        throw new Error(errorData.error || 'Upload failed');
-      }
-
-      const uploadData = await uploadResponse.json();
-      setStatus('Audio uploaded. Transcribing...');
-      setIsUploading(false);
-      setIsTranscribing(true);
-
-      // Transcribe audio
-      const transcribeResponse = await fetch('/api/voice/transcribe', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          recordingId: uploadData.recordingId,
-          audioUrl: uploadData.audioUrl,
-        }),
-      });
-
-      if (!transcribeResponse.ok) {
-        const errorData = await transcribeResponse.json().catch(() => ({}));
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
         throw new Error(errorData.error || 'Transcription failed');
       }
 
-      const transcribeData = await transcribeResponse.json();
-      setTranscript(transcribeData.transcript);
-      setStatus('Transcription complete!');
+      const data = await response.json();
+      setTranscript(data.transcript);
+      setStatus('Transcription complete! Content cataloged.');
 
       // Reset for new recording
       setAudioBlob(null);
@@ -236,7 +216,6 @@ export default function VoiceCapture() {
       setError(err instanceof Error ? err.message : 'Operation failed');
       setStatus('');
     } finally {
-      setIsUploading(false);
       setIsTranscribing(false);
     }
   };

@@ -28,43 +28,29 @@ export async function POST(request: NextRequest) {
       maxRetries: 0, // Don't retry on failure
     });
 
-    const body = await request.json();
-    const { recordingId, audioUrl } = body;
+    // Get FormData from request
+    const formData = await request.formData();
+    const audioFile = formData.get('audio') as File;
+    const projectId = formData.get('projectId') as string;
+    const durationSeconds = formData.get('durationSeconds') as string;
 
-    if (!recordingId) {
+    if (!audioFile) {
       return NextResponse.json(
-        { error: 'Recording ID is required' },
+        { error: 'Audio file is required' },
         { status: 400 }
       );
     }
 
-    if (!audioUrl) {
+    if (!projectId) {
       return NextResponse.json(
-        { error: 'Audio URL is required' },
+        { error: 'Project ID is required' },
         { status: 400 }
       );
     }
 
-    // Fetch the audio file
-    const audioResponse = await fetch(audioUrl);
-    if (!audioResponse.ok) {
-      return NextResponse.json(
-        { error: 'Failed to fetch audio file' },
-        { status: 500 }
-      );
-    }
-
-    const audioBuffer = await audioResponse.arrayBuffer();
-
-    // Create a File object for OpenAI
-    const audioFile = new File(
-      [audioBuffer],
-      'recording.webm',
-      { type: 'audio/webm' }
-    );
+    console.log(`🔷 [TRANSCRIBE] Received audio file: ${audioFile.name}, size: ${audioFile.size} bytes`);
 
     // Transcribe using Whisper
-    // Using default JSON format to get properly typed response
     const transcription = await openai.audio.transcriptions.create({
       file: audioFile,
       model: 'whisper-1',
@@ -72,33 +58,64 @@ export async function POST(request: NextRequest) {
     });
 
     const transcriptText = transcription.text;
+    console.log(`🔷 [TRANSCRIBE] Transcription complete: ${transcriptText.length} characters`);
 
-    // Update the database with the transcript
     const supabase = createServiceClient();
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { error: updateError } = await (supabase as any)
-      .from('voice_recordings')
-      .update({
-        transcript: transcriptText,
-        transcription_method: 'whisper-1',
-      })
-      .eq('id', recordingId);
+    // Get user ID from session (you may need to adjust this based on your auth setup)
+    const { data: { user } } = await supabase.auth.getUser();
 
-    if (updateError) {
-      console.error('Database update error:', updateError);
+    if (!user) {
       return NextResponse.json(
-        { error: `Failed to save transcript: ${updateError.message}` },
+        { error: 'User not authenticated' },
+        { status: 401 }
+      );
+    }
+
+    // Upload audio to Supabase Storage
+    const fileName = `${user.id}/${Date.now()}-recording.webm`;
+    const { data: uploadData, error: uploadError } = await supabase.storage
+      .from('voice-recordings')
+      .upload(fileName, audioFile, {
+        contentType: audioFile.type,
+        upsert: false,
+      });
+
+    if (uploadError) {
+      console.error('Storage upload error:', uploadError);
+      return NextResponse.json(
+        { error: `Failed to upload audio: ${uploadError.message}` },
         { status: 500 }
       );
     }
 
-    // Also create a thought blob from the transcript
-    const { data: recordingData } = await supabase
+    // Get public URL for the uploaded file
+    const { data: { publicUrl } } = supabase.storage
+      .from('voice-recordings')
+      .getPublicUrl(fileName);
+
+    // Create voice recording record
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data: recordingData, error: recordingError } = await (supabase as any)
       .from('voice_recordings')
-      .select('project_id, user_id')
-      .eq('id', recordingId)
+      .insert({
+        project_id: projectId,
+        user_id: user.id,
+        audio_url: publicUrl,
+        duration_seconds: parseInt(durationSeconds) || 0,
+        transcript: transcriptText,
+        transcription_method: 'whisper-1',
+      })
+      .select()
       .single();
+
+    if (recordingError) {
+      console.error('Database insert error:', recordingError);
+      return NextResponse.json(
+        { error: `Failed to save recording: ${recordingError.message}` },
+        { status: 500 }
+      );
+    }
 
     const typedRecordingData = recordingData as { project_id: string; user_id: string } | null;
 
@@ -145,7 +162,7 @@ export async function POST(request: NextRequest) {
     }
 
     return NextResponse.json({
-      recordingId,
+      recordingId: recordingData.id,
       transcript: transcriptText,
       wordCount: transcriptText.split(/\s+/).filter(Boolean).length,
     });
