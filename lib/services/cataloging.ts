@@ -100,7 +100,7 @@ export class CatalogingService {
 
       // Step 2: Map concepts to vocabulary terms
       console.log(`🔷 [CATALOGING_SERVICE] Step 2: Mapping concepts to vocabulary...`);
-      let matches: any[] = [];
+      let matches: VocabularyMatch[] = [];
       try {
         matches = await this.mapToVocabulary(concepts, vocabularySetId);
         console.log(`🔷 [CATALOGING_SERVICE] Found ${matches.length} vocabulary matches`);
@@ -269,7 +269,7 @@ Example output: ["love", "loss", "journey", "hope"]`,
     }
 
     console.log(`✅ [MAP_TO_VOCABULARY] Found ${terms.length} vocabulary terms in database`);
-    console.log(`📋 [MAP_TO_VOCABULARY] Sample terms:`, terms.slice(0, 5).map((t: any) => t.term));
+    console.log(`📋 [MAP_TO_VOCABULARY] Sample terms:`, terms.slice(0, 5).map((t) => (t as { term: string }).term));
 
     // Type assertion for vocabulary terms
     const typedTerms = terms as Array<{

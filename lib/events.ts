@@ -1,7 +1,7 @@
 // Simple event emitter for inter-component communication
 // Enables cellular architecture where components don't directly depend on each other
 
-type EventHandler = (data: any) => Promise<void> | void;
+type EventHandler = (data: unknown) => Promise<void> | void;
 
 class EventBus {
   private handlers: Map<string, EventHandler[]> = new Map();
@@ -28,7 +28,7 @@ class EventBus {
    * Emit an event to all registered handlers
    * Handlers are called in parallel
    */
-  async emit(event: string, data: any) {
+  async emit(event: string, data: unknown) {
     const handlers = this.handlers.get(event) || [];
 
     console.log(`🔷 [EVENT_BUS] Emitting event: ${event}, handlers registered: ${handlers.length}`);
