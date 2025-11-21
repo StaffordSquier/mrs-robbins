@@ -412,7 +412,7 @@ existing systems.
 
 ### Major System Components
 
-The system consists of 9 major architectural components:
+The system consists of 10 major architectural components:
 
 1.  **Content Collection Engine** - Multi-modal input capture (voice,
     text, import)
@@ -429,6 +429,7 @@ The system consists of 9 major architectural components:
     Hot/Warm/Cold context
 8.  **Content Filter System** - Pluggable quality analysis framework
 9.  **Endpoint Publication** - Format-specific output generation
+10.  **Documentation Engine & Support Knowledge Base** - Automated generation, storage, and semantic indexing of user-facing documentation and support knowledge derived from modules and system behavior.
 
 ### Component API Contracts
 
@@ -512,7 +513,7 @@ interface CatalogingOutput {
 **Processing Steps:** 1. Extract key concepts from content using Claude
 API 2. Map concepts to controlled vocabulary hierarchy 3. Apply semantic
 categorization 4. Extract named entities (people, places, events,
-concepts) 5. Generate metadata tags for searchability
+concepts) 5. Generate metadata tags for searchability 6. If the content is a documentation artifact, attach module-level metadata (moduleId, personas, docType) so the Documentation Engine and Support Assistant can target the correct audience.
 
 **Integration Points:** - Receives content from Content Collection
 Engine - Sends metadata to Storage Layer for indexing - Metadata used by
@@ -621,7 +622,7 @@ CREATE TABLE projects (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   user_id UUID REFERENCES users(id),
   title VARCHAR(255) NOT NULL,
-  endpoint_type VARCHAR(50), -- 'writer', 'entrepreneur', 'consultant', 'researcher'
+  endpoint_type VARCHAR(50), -- 'writer', 'entrepreneur', 'consultant', 'researcher', 'documentation'
   created_at TIMESTAMP DEFAULT NOW(),
   updated_at TIMESTAMP DEFAULT NOW()
 );
@@ -1092,7 +1093,7 @@ added to project - Never interrupts ongoing conversation
 Voice Translation Engine for prompt directives - Calls Claude API with
 full context + directives - Calls Content Filter System when user
 commits content - Updates conversation history in Storage Layer -
-Queries Serendipity Engine for related blobs sidebar
+Queries Serendipity Engine for related blobs sidebar - Can trigger the Documentation Engine when the user marks a module or feature as 'ready for release,' sending DocumentationGenerationInput with the current project/module context.
 
 **Dependencies:** - Claude API (conversational dialectic) - Voice
 Translation Engine (voice preservation) - Content Filter System (quality
@@ -1388,6 +1389,14 @@ Export to DOCX or PDF
 methodology, findings, conclusion - Bibliography/citations -
 Appendices - Export to structured document format
 
+**Documentation Endpoint → User Guide / FAQ / Release Notes:**
+- Uses Documentation Engine outputs (markdown) as source.
+- Formats content into user-facing guides, FAQs, or release notes.
+- Exports to:
+  - Markdown in `/docs/modules`
+  - Optional PDF for download or sharing
+- Ensures documentation remains consistent with the current version and module metadata.
+
 **TTS Integration (ElevenLabs):**
 
 ``` typescript
@@ -1425,6 +1434,129 @@ hosting)
 markdown - File generation errors: Retry once, then surface error to
 user - TTS API failures: Continue without audio, notify user - Large
 documents: Chunk for TTS (max 5K words per request)
+
+------------------------------------------------------------------------
+
+#### 10. Documentation Engine & Support Knowledge Base
+
+**Purpose:**
+
+The Documentation Engine converts internal system knowledge (module definitions, API surfaces, UX flows, and release changes) into structured, user-facing documentation artifacts. These artifacts are stored in GitHub and the database, embedded for semantic search, and exposed to a future customer-support assistant.
+
+The goal is that every module and major feature ships with:
+
+- A user-facing guide (how to use it)
+- Troubleshooting and FAQs
+- Release notes / change-impact summaries
+
+…and that all of this becomes a first-class, searchable knowledge base.
+
+---
+
+**Input API:**
+```typescript
+interface DocumentationGenerationInput {
+  moduleId: string;            // Stable internal identifier
+  moduleName: string;          // Human-readable name
+  version: string;             // Semantic version (e.g. "1.3.0")
+  changeSummary: string;       // High-level description of what changed
+  codeReferences: string[];    // File paths, endpoints, or component names
+  personas: ('writer' | 'entrepreneur' | 'consultant' | 'researcher')[];
+  userImpactNotes?: string;    // Plain-language notes from dev/product
+  releaseType: 'new' | 'update' | 'fix';
+}
+```
+
+**Output API:**
+```typescript
+interface DocumentationGenerationOutput {
+  docId: string;  // Internal document ID (DB + GitHub path)
+  moduleId: string;
+  version: string;
+  docType: 'user_guide' | 'faq' | 'release_notes';
+  markdownContent: string;
+  metadata: {
+    personas: string[];
+    lastUpdated: Date;
+    searchTags: string[];
+    sourceCommit: string;
+  };
+  storage: {
+    githubPath: string;   // e.g. /docs/modules/<module-name>.md
+    documentId: string;   // FK into documents table
+  };
+}
+```
+
+---
+
+**Processing Steps:**
+
+1. **Signal Collection**
+   * Receive DocumentationGenerationInput from:
+     * CI/CD pipeline (post-merge / post-release)
+     * Dialectical Editor ("Mark this module as ready and generate docs")
+     * Manual CLI or admin UI trigger
+
+2. **Context Aggregation**
+   * Pull related content from:
+     * Module code references (for naming and surface area)
+     * Project conversations and thought blobs
+     * Existing canonical document sections (if this is an update)
+   * Aggregate into a structured prompt for the LLM.
+
+3. **Template-Driven Generation**
+   * Apply standardized doc templates per `docType`:
+     * **User Guide:** Overview, prerequisites, step-by-step usage, examples
+     * **FAQ:** Common questions, error messages, remedies
+     * **Release Notes:** What changed, why, who it affects
+   * Enforce Mrs. Robbins voice guidelines and persona alignment.
+
+4. **Storage & Versioning**
+   * Write markdown to GitHub under `/docs/modules/<module-name>.md`.
+   * Store a synchronized copy in the `documents` table with an appropriate endpoint type (e.g. `endpoint_type = 'documentation'`).
+   * Attach metadata (personas, tags, moduleId, version) for cataloging and search.
+
+5. **Semantic Indexing**
+   * Chunk documentation into sections.
+   * Generate embeddings and store in `embeddings` (or a dedicated documentation_embeddings table, if needed).
+   * Tag documentation chunks so downstream support tools can filter by docType/module/persona.
+
+6. **Exposure to Support Tools**
+   * Provide an internal API for a future Support Assistant to:
+     * Query documentation by module, persona, or free-text semantic search.
+     * Retrieve relevant snippets with citations back to markdown files.
+
+---
+
+**Integration Points:**
+
+* **Content Collection Engine**
+  * Source material for documentation (project content, transcripts, drafts).
+
+* **Cataloging Engine**
+  * Documentation artifacts are cataloged with moduleId, personas, and controlled vocabulary tags.
+
+* **Embedding Service**
+  * Documentation markdown is embedded and indexed for semantic retrieval.
+
+* **Storage Layer**
+  * Uses `documents` for canonical docs and `embeddings` for search.
+
+* **Dialectical Editor**
+  * Provides a UX hook: "Generate user documentation for this module" which sends DocumentationGenerationInput.
+
+* **Endpoint Publication**
+  * Reuses markdown/PDF generation to ship documentation as user-downloadable guides or internal help articles.
+
+**Error Handling:**
+
+* LLM generation failure:
+  * Retry once with reduced context; on repeated failure, log and surface an actionable error to the developer.
+* GitHub write failure:
+  * Queue write and retry; keep DB state in sync, or mark documentation as "pending export".
+* Embedding/indexing failure:
+  * Store markdown anyway; log indexing error and schedule a background reindex job.
 
 ## CHUNK 7 of 29: Feature Specifications - Core Architecture Features
 
@@ -2408,7 +2540,118 @@ for avatar IDs - JSON validation for import/export
 
 ------------------------------------------------------------------------
 
-### FEATURE 7: Database Schema & Infrastructure (CARD A7)
+### FEATURE 7: Documentation Engine & Support Knowledge Base (CARD A12)
+
+**Status:** ⚠️ Architecture Defined, Not Built
+
+**User Story:**
+
+As the product owner and future support team, I want module-level user documentation and FAQs to be generated automatically as part of the development workflow, so that 60–80% of customer questions can be answered by an AI assistant reading a single, coherent knowledge base instead of scattered notes.
+
+---
+
+**Acceptance Criteria:**
+
+- Every module that reaches "ready for release" has at least:
+  - One user guide
+  - One FAQ section
+  - Associated release notes
+- Documentation is generated via a standardized DocGen prompt using module metadata and change summaries.
+- All documentation is stored:
+  - As markdown files in GitHub under `/docs/modules/…`
+  - In the `documents` table with `endpoint_type = 'documentation'`.
+- Documentation is automatically embedded and indexed for semantic search within 60 seconds of generation.
+- A downstream Support Assistant can:
+  - Query by module name, persona, or error message.
+  - Retrieve relevant documentation snippets with citations.
+- Regeneration on new releases:
+  - On `releaseType = 'update' | 'fix'`, docs are updated or versioned appropriately.
+- End-to-end latency (trigger → docs available to search) ≤ 2 minutes in Alpha.
+
+---
+
+**Technical Implementation:**
+
+- **DocGen Prompt Template:**
+  - Standardized prompt that takes DocumentationGenerationInput and outputs:
+    - Intro/overview
+    - Preconditions and configuration
+    - Step-by-step usage
+    - Common error messages and how to resolve them
+    - What changed in this release and who it affects
+
+- **Triggering Mechanisms:**
+  - GitHub Actions job on:
+    - Merged PR with module label (e.g. `module:content-engine`)
+    - Tagged releases (e.g. `v1.3.0`)
+  - Manual trigger from Dialectical Editor:
+    - "Generate user docs for this module (Alpha)" button.
+
+- **Storage & GitHub Integration:**
+  - Write docs to `/docs/modules/<module-name>.md`.
+  - Commit message convention: `docs: update <module-name> docs for v<version>`.
+  - Synchronize document metadata into `documents` and `content_metadata`.
+
+- **Indexing:**
+  - Reuse Embedding Service for markdown chunks.
+  - Tag documentation chunks with:
+    - `docType`, `moduleId`, `personas`, `version`.
+  - Index into `embeddings` with fast similarity search for support use cases.
+
+---
+
+**Database Schema Additions (Conceptual):**
+
+> Note: Implemented either as new tables or as extensions of existing ones.
+
+- Option A: Extend existing `documents` table to explicitly allow `endpoint_type = 'documentation'`.
+- Option B (future): Introduce `documentation_artifacts` as a thin view or dedicated table specializing `documents` for support knowledge.
+
+---
+
+**API Contract:**
+```typescript
+POST /api/docs/generate
+Request: DocumentationGenerationInput
+Response: DocumentationGenerationOutput
+
+GET /api/docs/by-module
+Request: { moduleId: string }
+Response: { docs: DocumentationGenerationOutput[] }
+
+POST /api/docs/reindex
+Request: { moduleId?: string }
+Response: { success: boolean, reindexedCount: number }
+```
+
+---
+
+**Integration Points:**
+
+* Called from CI/CD on release events.
+* Called from Dialectical Editor for manual generation.
+* Uses Cataloging Engine to assign categories and tags.
+* Uses Embedding Service to index documentation for Support Assistant queries.
+* Exposed as a special-case consumer of Endpoint Publication for rendering PDFs or other formats.
+
+---
+
+**Error Handling:**
+
+* If GitHub write fails, mark docs as `status = 'pending_export'` and retry with exponential backoff.
+* If embedding fails, still expose docs in raw markdown and schedule a reindex job.
+* If LLM generation fails, surface a clear error in the dev/support UI with a "Regenerate" option.
+
+**Dependencies:**
+
+* Claude API (for DocGen prompt execution)
+* GitHub repo with `/docs/modules` directory
+* Storage Layer (`documents`, `content_metadata`, `embeddings`)
+* Embedding Service
+
+------------------------------------------------------------------------
+
+### FEATURE 8: Database Schema & Infrastructure (CARD A7)
 
 **Status:** ✅ Schema Designed and Deployed to Supabase
 
