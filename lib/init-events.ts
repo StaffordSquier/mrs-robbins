@@ -4,7 +4,7 @@
  * Import this in app startup to wire up the event system
  */
 
-import { eventBus, EVENTS, ContentCreatedEvent } from './events';
+import { eventBus, EVENTS, ContentCreatedEvent, ContentCatalogedEvent, EmbeddingGeneratedEvent } from './events';
 import { catalogingService } from './services/cataloging';
 import { logError, logInfo } from './error-logger';
 
@@ -19,51 +19,52 @@ export function initializeEventListeners() {
   console.log('🔷 [INIT_EVENTS] Initializing event listeners...');
 
   // Register cataloging service to auto-catalog new content
-  eventBus.on(EVENTS.CONTENT_CREATED, async (data: ContentCreatedEvent) => {
+  eventBus.on(EVENTS.CONTENT_CREATED, async (data) => {
+    const eventData = data as ContentCreatedEvent;
     try {
-      console.log(`🔷 [CATALOGING] Starting auto-cataloging for content: ${data.contentId}`);
-      console.log(`🔷 [CATALOGING] Content preview: ${data.content.substring(0, 100)}...`);
+      console.log(`🔷 [CATALOGING] Starting auto-cataloging for content: ${eventData.contentId}`);
+      console.log(`🔷 [CATALOGING] Content preview: ${eventData.content.substring(0, 100)}...`);
 
       // Log that we're starting cataloging
       await logInfo(
         'cataloging',
         'content_created_event',
-        `Starting cataloging for ${data.contentId}`,
-        { contentType: data.contentType, contentLength: data.content.length }
+        `Starting cataloging for ${eventData.contentId}`,
+        { contentType: eventData.contentType, contentLength: eventData.content.length }
       );
 
       await catalogingService.categorize(
-        data.contentId,
-        data.content,
-        data.contentType,
-        data.vocabularySetId
+        eventData.contentId,
+        eventData.content,
+        eventData.contentType,
+        eventData.vocabularySetId
       );
 
-      console.log(`✅ [CATALOGING] Successfully cataloged content: ${data.contentId}`);
+      console.log(`✅ [CATALOGING] Successfully cataloged content: ${eventData.contentId}`);
 
       // Log success
       await logInfo(
         'cataloging',
         'content_cataloged',
-        `Successfully cataloged ${data.contentId}`,
-        { contentId: data.contentId }
+        `Successfully cataloged ${eventData.contentId}`,
+        { contentId: eventData.contentId }
       );
     } catch (error) {
-      console.error(`❌ [CATALOGING] Error auto-cataloging content ${data.contentId}:`, error);
+      console.error(`❌ [CATALOGING] Error auto-cataloging content ${eventData.contentId}:`, error);
 
       // Log the error to database for production debugging
       await logError({
         errorType: 'cataloging',
         severity: 'error',
-        contentId: data.contentId,
-        contentType: data.contentType,
+        contentId: eventData.contentId,
+        contentType: eventData.contentType,
         operation: 'auto_catalog_on_create',
         errorMessage: error instanceof Error ? error.message : String(error),
         errorStack: error instanceof Error ? error.stack : undefined,
         errorData: {
-          contentLength: data.content.length,
-          contentPreview: data.content.substring(0, 200),
-          vocabularySetId: data.vocabularySetId,
+          contentLength: eventData.content.length,
+          contentPreview: eventData.content.substring(0, 200),
+          vocabularySetId: eventData.vocabularySetId,
         },
       });
 
@@ -73,12 +74,14 @@ export function initializeEventListeners() {
 
   // Log cataloged events
   eventBus.on(EVENTS.CONTENT_CATALOGED, async (data) => {
-    console.log(`Content cataloged: ${data.contentId} with ${data.terms.length} terms`);
+    const eventData = data as ContentCatalogedEvent;
+    console.log(`Content cataloged: ${eventData.contentId} with ${eventData.terms.length} terms`);
   });
 
   // Log embedding generation
   eventBus.on(EVENTS.EMBEDDING_GENERATED, async (data) => {
-    console.log(`Embedding generated for: ${data.contentId}`);
+    const eventData = data as EmbeddingGeneratedEvent;
+    console.log(`Embedding generated for: ${eventData.contentId}`);
   });
 
   initialized = true;
