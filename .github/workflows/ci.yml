@@ -50,3 +50,22 @@ jobs:
       run: |
         curl -f http://localhost:3000/api/evaluate-voice -X POST -H "Content-Type: application/json" -d '{"baselineText":"test","tunedText":"test","variables":{}}' || exit 1
       continue-on-error: true
+
+  spec-compliance:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        
+    - name: Check Architecture Compliance - Phase 1
+      if: github.event_name == 'pull_request'
+      run: |
+        echo "=== Architecture Compliance Checks ==="
+        
+        # Check 1: TypeScript
