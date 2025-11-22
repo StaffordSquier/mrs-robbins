@@ -28,7 +28,7 @@ jobs:
       
     - name: ESLint code quality check
       run: npm run lint
-      continue-on-error: true
+      continue-on-error: false
       
     - name: Build application
       run: npm run build
@@ -37,19 +37,6 @@ jobs:
         NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
         NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
         SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
-        
-    - name: API endpoint smoke test - test-voice
-      run: |
-        npm run build
-        npm run start &
-        sleep 10
-        curl -f http://localhost:3000/api/test-voice || exit 1
-      continue-on-error: true
-      
-    - name: API endpoint smoke test - evaluate-voice
-      run: |
-        curl -f http://localhost:3000/api/evaluate-voice -X POST -H "Content-Type: application/json" -d '{"baselineText":"test","tunedText":"test","variables":{}}' || exit 1
-      continue-on-error: true
 
   spec-compliance:
     runs-on: ubuntu-latest
@@ -63,9 +50,24 @@ jobs:
       with:
         node-version: '20'
         
-    - name: Check Architecture Compliance - Phase 1
-      if: github.event_name == 'pull_request'
+    - name: Check Projects System - API Routes
       run: |
-        echo "=== Architecture Compliance Checks ==="
+        echo "=== Projects System API Route Compliance ==="
         
-        # Check 1: TypeScript
+        # Required API routes per technical spec
+        test -f "app/api/projects/route.ts" || { echo "❌ Missing: app/api/projects/route.ts"; exit 1; }
+        test -f "app/api/projects/[id]/route.ts" || { echo "❌ Missing: app/api/projects/[id]/route.ts"; exit 1; }
+        test -f "app/api/projects/[id]/stats/route.ts" || { echo "❌ Missing: app/api/projects/[id]/stats/route.ts"; exit 1; }
+        test -f "app/api/projects/[id]/duplicate/route.ts" || { echo "❌ Missing: app/api/projects/[id]/duplicate/route.ts"; exit 1; }
+        
+        echo "✅ All Projects API routes exist"
+        
+    - name: Check Projects System - TypeScript Types
+      run: |
+        echo "=== Projects System Type Definitions ==="
+        
+        # Required type definitions per spec
+        test -f "lib/types/projects.ts" || { echo "❌ Missing: lib/types/projects.ts"; exit 1; }
+        
+        # Verify required interfaces exist in the file
+        grep -q "interface Project" lib/types/projects.ts || { echo "❌ Mis

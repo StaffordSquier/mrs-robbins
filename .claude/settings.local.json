@@ -43,7 +43,12 @@
       "Bash(lib/services/context-manager.ts )",
       "Bash(lib/services/dialectical-editor.ts )",
       "Bash(lib/services/embedding.ts )",
-      "Bash(lib/services/serendipity.ts)"
+      "Bash(lib/services/serendipity.ts)",
+      "Bash(npx create-next-app@14:*)",
+      "Bash(pkill:*)",
+      "Bash(yes no)",
+      "Bash(cp:*)",
+      "Bash(rm:*)"
     ],
     "deny": [],
     "ask": []
