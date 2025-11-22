@@ -1,11 +1,56 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { createServerClient } from '@supabase/ssr';
+import { cookies } from 'next/headers';
 import { createServiceClient, isSupabaseConfigured, Database } from '@/lib/supabase';
 import OpenAI from 'openai';
 
 type ThoughtBlobInsert = Database['public']['Tables']['thought_blobs']['Insert'];
 
+async function getAuthenticatedClient() {
+  try {
+    const cookieStore = await cookies();
+
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          getAll() {
+            return cookieStore.getAll();
+          },
+          setAll(cookiesToSet) {
+            cookiesToSet.forEach(({ name, value, options }) => {
+              cookieStore.set(name, value, options);
+            });
+          },
+        },
+      }
+    );
+
+    const { data: { user }, error } = await supabase.auth.getUser();
+
+    if (error || !user) {
+      return null;
+    }
+
+    return supabase;
+  } catch (error) {
+    console.error('Authentication error:', error);
+    return null;
+  }
+}
+
 export async function POST(request: NextRequest) {
   try {
+    const authClient = await getAuthenticatedClient();
+
+    if (!authClient) {
+      return NextResponse.json(
+        { error: 'Unauthorized' },
+        { status: 401 }
+      );
+    }
+
     if (!isSupabaseConfigured) {
       return NextResponse.json(
         { error: 'Supabase is not configured' },
