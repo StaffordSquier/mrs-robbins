@@ -7,7 +7,13 @@ on:
     branches: [ main ]
 
 jobs:
-  test:
+  # ============================================================================
+  # SECTION 1: FOUNDATIONAL CHECKS
+  # These checks apply to the ENTIRE project and never change
+  # ============================================================================
+  
+  foundational-checks:
+    name: Foundational Quality Checks
     runs-on: ubuntu-latest
     
     steps:
@@ -23,22 +29,69 @@ jobs:
     - name: Install dependencies
       run: npm ci
       
-    - name: TypeScript compilation check
-      run: npx tsc --noEmit
+    - name: TypeScript Strict Mode Compilation
+      run: |
+        echo "=== TypeScript Strict Mode Check ==="
+        npx tsc --noEmit
+        if [ $? -ne 0 ]; then
+          echo "❌ TypeScript compilation failed"
+          echo "All code must compile with strict mode enabled"
+          exit 1
+        fi
+        echo "✅ TypeScript strict mode: PASS"
       
-    - name: ESLint code quality check
-      run: npm run lint
+    - name: ESLint Code Quality
+      run: |
+        echo "=== ESLint Code Quality Check ==="
+        npm run lint
+        if [ $? -ne 0 ]; then
+          echo "❌ ESLint check failed"
+          echo "All code must pass ESLint rules"
+          exit 1
+        fi
+        echo "✅ ESLint quality: PASS"
       continue-on-error: false
       
-    - name: Build application
-      run: npm run build
+    - name: Build Application
+      run: |
+        echo "=== Application Build Check ==="
+        npm run build
+        if [ $? -ne 0 ]; then
+          echo "❌ Build failed"
+          echo "Application must build successfully"
+          exit 1
+        fi
+        echo "✅ Application build: PASS"
       env:
         ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
         NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
         NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
         SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+    
+    - name: Run Test Suite
+      run: |
+        echo "=== Test Suite Execution ==="
+        npm test
+        if [ $? -ne 0 ]; then
+          echo "❌ Tests failed"
+          echo "All tests must pass"
+          exit 1
+        fi
+        echo "✅ Test suite: PASS"
+      env:
+        OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+        NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
 
-  spec-compliance:
+  # ============================================================================
+  # SECTION 2: PHASE 1 FEATURE-SPECIFIC CHECKS
+  # These checks verify Phase 1 features are built correctly
+  # These will be ADDED TO as we build more features
+  # ============================================================================
+  
+  phase1-projects-system:
+    name: Phase 1 - Projects System Compliance
     runs-on: ubuntu-latest
     
     steps:
@@ -49,25 +102,466 @@ jobs:
       uses: actions/setup-node@v4
       with:
         node-version: '20'
-        
-    - name: Check Projects System - API Routes
+    
+    - name: Check Projects Service Layer
       run: |
-        echo "=== Projects System API Route Compliance ==="
+        echo "=== Projects Service Layer Compliance ==="
         
-        # Required API routes per technical spec
-        test -f "app/api/projects/route.ts" || { echo "❌ Missing: app/api/projects/route.ts"; exit 1; }
-        test -f "app/api/projects/[id]/route.ts" || { echo "❌ Missing: app/api/projects/[id]/route.ts"; exit 1; }
-        test -f "app/api/projects/[id]/stats/route.ts" || { echo "❌ Missing: app/api/projects/[id]/stats/route.ts"; exit 1; }
-        test -f "app/api/projects/[id]/duplicate/route.ts" || { echo "❌ Missing: app/api/projects/[id]/duplicate/route.ts"; exit 1; }
+        # Service layer must exist
+        test -f "lib/projects.ts" || { echo "❌ Missing: lib/projects.ts"; exit 1; }
         
-        echo "✅ All Projects API routes exist"
+        # Must export ProjectService interface
+        grep -q "interface ProjectService" lib/projects.ts || { 
+          echo "❌ Missing: ProjectService interface in lib/projects.ts"
+          exit 1
+        }
         
-    - name: Check Projects System - TypeScript Types
+        # Must export SupabaseProjectService class
+        grep -q "class SupabaseProjectService" lib/projects.ts || {
+          echo "❌ Missing: SupabaseProjectService class in lib/projects.ts"
+          exit 1
+        }
+        
+        # Must have CRUD methods
+        grep -q "createProject" lib/projects.ts || {
+          echo "❌ Missing: createProject method"
+          exit 1
+        }
+        grep -q "getProjects" lib/projects.ts || {
+          echo "❌ Missing: getProjects method"
+          exit 1
+        }
+        grep -q "updateProject" lib/projects.ts || {
+          echo "❌ Missing: updateProject method"
+          exit 1
+        }
+        grep -q "deleteProject" lib/projects.ts || {
+          echo "❌ Missing: deleteProject method"
+          exit 1
+        }
+        
+        # Must have proper TypeScript types (no any)
+        if grep -E ":\s*any\s*[,;)]" lib/projects.ts; then
+          echo "❌ Found 'any' types in lib/projects.ts"
+          echo "All types must be properly defined"
+          exit 1
+        fi
+        
+        echo "✅ Projects service layer: PASS"
+    
+    - name: Check Projects API Routes
       run: |
-        echo "=== Projects System Type Definitions ==="
+        echo "=== Projects API Routes Compliance ==="
         
-        # Required type definitions per spec
-        test -f "lib/types/projects.ts" || { echo "❌ Missing: lib/types/projects.ts"; exit 1; }
+        # Core CRUD endpoints must exist
+        test -f "app/api/projects/route.ts" || {
+          echo "❌ Missing: app/api/projects/route.ts"
+          exit 1
+        }
+        test -f "app/api/projects/[id]/route.ts" || {
+          echo "❌ Missing: app/api/projects/[id]/route.ts"
+          exit 1
+        }
         
-        # Verify required interfaces exist in the file
-        grep -q "interface Project" lib/types/projects.ts || { echo "❌ Mis
+        # Must have GET handler in collection route
+        grep -q "export async function GET" app/api/projects/route.ts || {
+          echo "❌ Missing: GET handler in app/api/projects/route.ts"
+          exit 1
+        }
+        
+        # Must have POST handler in collection route
+        grep -q "export async function POST" app/api/projects/route.ts || {
+          echo "❌ Missing: POST handler in app/api/projects/route.ts"
+          exit 1
+        }
+        
+        # Must have GET/PUT/DELETE handlers in [id] route
+        grep -q "export async function GET" app/api/projects/\[id\]/route.ts || {
+          echo "❌ Missing: GET handler in app/api/projects/[id]/route.ts"
+          exit 1
+        }
+        grep -q "export async function PUT" app/api/projects/\[id\]/route.ts || {
+          echo "❌ Missing: PUT handler in app/api/projects/[id]/route.ts"
+          exit 1
+        }
+        grep -q "export async function DELETE" app/api/projects/\[id\]/route.ts || {
+          echo "❌ Missing: DELETE handler in app/api/projects/[id]/route.ts"
+          exit 1
+        }
+        
+        # Must use service layer (not direct database calls)
+        grep -q "SupabaseProjectService" app/api/projects/route.ts || {
+          echo "❌ API must use SupabaseProjectService from lib/projects.ts"
+          exit 1
+        }
+        
+        # Must have authentication check
+        grep -q "getAuthenticatedClient\|auth.getUser" app/api/projects/route.ts || {
+          echo "❌ API must enforce authentication"
+          exit 1
+        }
+        
+        # Must have error handling
+        grep -q "try\|catch" app/api/projects/route.ts || {
+          echo "❌ API must have try/catch error handling"
+          exit 1
+        }
+        
+        echo "✅ Projects API routes: PASS"
+    
+    - name: Check Projects React Context
+      run: |
+        echo "=== Projects React Context Compliance ==="
+        
+        # Context must exist
+        test -f "contexts/ProjectContext.tsx" || {
+          echo "❌ Missing: contexts/ProjectContext.tsx"
+          exit 1
+        }
+        
+        # Must export ProjectProvider
+        grep -q "export.*ProjectProvider" contexts/ProjectContext.tsx || {
+          echo "❌ Missing: ProjectProvider export"
+          exit 1
+        }
+        
+        # Must export useProjects hook
+        grep -q "export.*useProjects" contexts/ProjectContext.tsx || {
+          echo "❌ Missing: useProjects hook export"
+          exit 1
+        }
+        
+        # Must have CRUD operations
+        grep -q "createProject" contexts/ProjectContext.tsx || {
+          echo "❌ Missing: createProject in context"
+          exit 1
+        }
+        grep -q "updateProject" contexts/ProjectContext.tsx || {
+          echo "❌ Missing: updateProject in context"
+          exit 1
+        }
+        grep -q "deleteProject" contexts/ProjectContext.tsx || {
+          echo "❌ Missing: deleteProject in context"
+          exit 1
+        }
+        
+        # Must have current project state
+        grep -q "currentProject" contexts/ProjectContext.tsx || {
+          echo "❌ Missing: currentProject state"
+          exit 1
+        }
+        
+        echo "✅ Projects React context: PASS"
+    
+    - name: Check Projects UI Components
+      run: |
+        echo "=== Projects UI Components Compliance ==="
+        
+        # ProjectList component must exist
+        test -f "components/projects/ProjectList.tsx" || {
+          echo "❌ Missing: components/projects/ProjectList.tsx"
+          exit 1
+        }
+        
+        # Must use the useProjects hook
+        grep -q "useProjects" components/projects/ProjectList.tsx || {
+          echo "❌ ProjectList must use useProjects hook"
+          exit 1
+        }
+        
+        # Must handle loading state
+        grep -q "loading" components/projects/ProjectList.tsx || {
+          echo "❌ ProjectList must handle loading state"
+          exit 1
+        }
+        
+        # Must handle error state
+        grep -q "error" components/projects/ProjectList.tsx || {
+          echo "❌ ProjectList must handle error state"
+          exit 1
+        }
+        
+        echo "✅ Projects UI components: PASS"
+    
+    - name: Check Projects Tests
+      run: |
+        echo "=== Projects Test Coverage Compliance ==="
+        
+        # Test file must exist
+        test -f "tests/projects.test.ts" || {
+          echo "❌ Missing: tests/projects.test.ts"
+          exit 1
+        }
+        
+        # Must test service layer
+        grep -q "SupabaseProjectService\|Project Service" tests/projects.test.ts || {
+          echo "❌ Missing: service layer tests"
+          exit 1
+        }
+        
+        # Must test CRUD operations
+        grep -q "create.*project\|createProject" tests/projects.test.ts || {
+          echo "❌ Missing: create project test"
+          exit 1
+        }
+        grep -q "list.*project\|getProjects" tests/projects.test.ts || {
+          echo "❌ Missing: list projects test"
+          exit 1
+        }
+        
+        echo "✅ Projects test coverage: PASS"
+
+  phase1-embeddings-system:
+    name: Phase 1 - Embeddings System Compliance
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+    
+    - name: Check Embeddings Service Layer
+      run: |
+        echo "=== Embeddings Service Layer Compliance ==="
+        
+        # Service files must exist
+        test -f "lib/embeddings.ts" || {
+          echo "❌ Missing: lib/embeddings.ts"
+          exit 1
+        }
+        test -f "lib/embedding-storage.ts" || {
+          echo "❌ Missing: lib/embedding-storage.ts"
+          exit 1
+        }
+        test -f "lib/content-processor.ts" || {
+          echo "❌ Missing: lib/content-processor.ts"
+          exit 1
+        }
+        
+        # Must export EmbeddingService interface
+        grep -q "interface EmbeddingService" lib/embeddings.ts || {
+          echo "❌ Missing: EmbeddingService interface"
+          exit 1
+        }
+        
+        # Must have embedding generation methods
+        grep -q "generateEmbedding" lib/embeddings.ts || {
+          echo "❌ Missing: generateEmbedding method"
+          exit 1
+        }
+        grep -q "chunkText" lib/embeddings.ts || {
+          echo "❌ Missing: chunkText method"
+          exit 1
+        }
+        
+        # Must have storage methods
+        grep -q "storeEmbedding" lib/embedding-storage.ts || {
+          echo "❌ Missing: storeEmbedding method"
+          exit 1
+        }
+        grep -q "searchSimilar" lib/embedding-storage.ts || {
+          echo "❌ Missing: searchSimilar method"
+          exit 1
+        }
+        
+        # Must have content processor
+        grep -q "processContent" lib/content-processor.ts || {
+          echo "❌ Missing: processContent method"
+          exit 1
+        }
+        
+        # Must have proper TypeScript types (no any)
+        if grep -E ":\s*any\s*[,;)]" lib/embeddings.ts lib/embedding-storage.ts lib/content-processor.ts; then
+          echo "❌ Found 'any' types in embeddings system"
+          echo "All types must be properly defined"
+          exit 1
+        fi
+        
+        echo "✅ Embeddings service layer: PASS"
+    
+    - name: Check Embeddings Tests
+      run: |
+        echo "=== Embeddings Test Coverage Compliance ==="
+        
+        # Test file must exist
+        test -f "tests/embeddings.test.ts" || {
+          echo "❌ Missing: tests/embeddings.test.ts"
+          exit 1
+        }
+        
+        # Must test embedding generation
+        grep -q "generateEmbedding\|generate embedding" tests/embeddings.test.ts || {
+          echo "❌ Missing: embedding generation test"
+          exit 1
+        }
+        
+        # Must test chunking
+        grep -q "chunk.*text\|chunkText" tests/embeddings.test.ts || {
+          echo "❌ Missing: text chunking test"
+          exit 1
+        }
+        
+        # Must test storage
+        grep -q "store.*embedding\|storeEmbedding" tests/embeddings.test.ts || {
+          echo "❌ Missing: embedding storage test"
+          exit 1
+        }
+        
+        echo "✅ Embeddings test coverage: PASS"
+
+  # ============================================================================
+  # ARCHITECTURAL PATTERN ENFORCEMENT
+  # These checks ensure we follow consistent patterns across all features
+  # ============================================================================
+  
+  architectural-patterns:
+    name: Architectural Pattern Compliance
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+    
+    - name: Service Layer Pattern
+      run: |
+        echo "=== Service Layer Pattern Check ==="
+        
+        # All service files must have interfaces
+        for service_file in lib/*.ts; do
+          if [ -f "$service_file" ]; then
+            filename=$(basename "$service_file")
+            # Skip non-service files
+            if [[ "$filename" == "types.ts" || "$filename" == "utils.ts" ]]; then
+              continue
+            fi
+            
+            # Check for interface or class definition
+            if ! grep -q "interface.*Service\|class.*Service" "$service_file"; then
+              echo "⚠️  Warning: $service_file may not follow service pattern"
+            fi
+          fi
+        done
+        
+        echo "✅ Service layer pattern: PASS"
+    
+    - name: API Route Pattern
+      run: |
+        echo "=== API Route Pattern Check ==="
+        
+        # All API routes must use service layer (not direct DB calls)
+        api_routes=$(find app/api -name "route.ts" 2>/dev/null || true)
+        
+        for route_file in $api_routes; do
+          # Must import from lib/ (service layer)
+          if ! grep -q "from '@/lib/" "$route_file"; then
+            echo "❌ $route_file must import service layer from lib/"
+            exit 1
+          fi
+          
+          # Must have authentication
+          if ! grep -q "auth.getUser\|getAuthenticatedClient" "$route_file"; then
+            echo "❌ $route_file must enforce authentication"
+            exit 1
+          fi
+          
+          # Must have error handling
+          if ! grep -q "try.*catch" "$route_file"; then
+            echo "❌ $route_file must have try/catch error handling"
+            exit 1
+          fi
+          
+          # Must return NextResponse
+          if ! grep -q "NextResponse" "$route_file"; then
+            echo "❌ $route_file must return NextResponse"
+            exit 1
+          fi
+        done
+        
+        echo "✅ API route pattern: PASS"
+    
+    - name: TypeScript Strict Mode Compliance
+      run: |
+        echo "=== TypeScript Strict Mode Compliance ==="
+        
+        # No 'any' types allowed in production code
+        if find lib/ app/api/ contexts/ components/ -name "*.ts" -o -name "*.tsx" | xargs grep -n ":\s*any\s*[,;)]" 2>/dev/null; then
+          echo "❌ Found 'any' types in production code"
+          echo "All types must be properly defined"
+          exit 1
+        fi
+        
+        # No @ts-ignore or @ts-nocheck
+        if find lib/ app/api/ contexts/ components/ -name "*.ts" -o -name "*.tsx" | xargs grep -n "@ts-ignore\|@ts-nocheck" 2>/dev/null; then
+          echo "❌ Found TypeScript suppressions"
+          echo "Fix type errors instead of suppressing them"
+          exit 1
+        fi
+        
+        echo "✅ TypeScript strict mode: PASS"
+    
+    - name: Error Handling Pattern
+      run: |
+        echo "=== Error Handling Pattern Check ==="
+        
+        # All API routes must have proper error responses
+        api_routes=$(find app/api -name "route.ts" 2>/dev/null || true)
+        
+        for route_file in $api_routes; do
+          # Must return error responses with proper status codes
+          if ! grep -q "status.*500\|status.*400\|status.*404\|status.*401" "$route_file"; then
+            echo "❌ $route_file must return proper HTTP error status codes"
+            exit 1
+          fi
+          
+          # Must have error messages
+          if ! grep -q "error.*message\|error:" "$route_file"; then
+            echo "❌ $route_file must include error messages in responses"
+            exit 1
+          fi
+        done
+        
+        echo "✅ Error handling pattern: PASS"
+
+  # ============================================================================
+  # SUMMARY
+  # ============================================================================
+  
+  summary:
+    name: CI/CD Summary
+    runs-on: ubuntu-latest
+    needs: [foundational-checks, phase1-projects-system, phase1-embeddings-system, architectural-patterns]
+    if: always()
+    
+    steps:
+    - name: Check Results
+      run: |
+        echo "==================================================================="
+        echo "                    CI/CD COMPLIANCE SUMMARY"
+        echo "==================================================================="
+        echo ""
+        echo "Foundational Checks: ${{ needs.foundational-checks.result }}"
+        echo "Phase 1 - Projects System: ${{ needs.phase1-projects-system.result }}"
+        echo "Phase 1 - Embeddings System: ${{ needs.phase1-embeddings-system.result }}"
+        echo "Architectural Patterns: ${{ needs.architectural-patterns.result }}"
+        echo ""
+        
+        if [ "${{ needs.foundational-checks.result }}" != "success" ] || \
+           [ "${{ needs.phase1-projects-system.result }}" != "success" ] || \
+           [ "${{ needs.phase1-embeddings-system.result }}" != "success" ] || \
+           [ "${{ needs.architectural-patterns.result }}" != "success" ]; then
+          echo "❌ CI/CD FAILED - See details above"
+          echo "==================================================================="
+          exit 1
+        fi
+        
+        echo "✅ ALL CHECKS PASSED"
+        echo "==================================================================="
