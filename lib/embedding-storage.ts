@@ -27,6 +27,14 @@ export interface SimilarContent {
   endPosition: number;
 }
 
+interface DatabaseEmbeddingRow {
+  content_id: string;
+  chunk_text: string;
+  similarity: number;
+  start_position: number;
+  end_position: number;
+}
+
 export interface EmbeddingStorage {
   storeEmbedding(params: StoreEmbeddingParams): Promise<void>;
   searchSimilar(params: SearchSimilarParams): Promise<SimilarContent[]>;
@@ -58,7 +66,7 @@ export class SupabaseEmbeddingStorage implements EmbeddingStorage {
     const limit = params.limit ?? 10;
 
     // pgvector cosine similarity search
-    let query = this.supabase.rpc('match_embeddings', {
+    const query = this.supabase.rpc('match_embeddings', {
       query_embedding: params.embedding,
       match_threshold: threshold,
       match_count: limit
@@ -68,7 +76,7 @@ export class SupabaseEmbeddingStorage implements EmbeddingStorage {
 
     if (error) throw error;
 
-    return data.map((row: Record<string, any>) => ({
+    return data.map((row: DatabaseEmbeddingRow) => ({
       contentId: row.content_id,
       chunkText: row.chunk_text,
       similarity: row.similarity,

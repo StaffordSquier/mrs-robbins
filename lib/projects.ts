@@ -11,6 +11,15 @@ export interface Project {
   updatedAt: Date;
 }
 
+interface DatabaseProjectRow {
+  id: string;
+  user_id: string;
+  title: string;
+  endpoint_type: string;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface CreateProjectParams {
   title: string;
   endpointType: Project['endpointType'];
@@ -75,7 +84,7 @@ export class SupabaseProjectService implements ProjectService {
   }
 
   async updateProject(id: string, params: UpdateProjectParams): Promise<Project> {
-    const updates: Record<string, any> = { updated_at: new Date().toISOString() };
+    const updates: Partial<DatabaseProjectRow> = { updated_at: new Date().toISOString() };
     if (params.title) updates.title = params.title;
     if (params.endpointType) updates.endpoint_type = params.endpointType;
 
@@ -100,12 +109,12 @@ export class SupabaseProjectService implements ProjectService {
     if (error) throw error;
   }
 
-  private mapToProject(data: Record<string, any>): Project {
+  private mapToProject(data: DatabaseProjectRow): Project {
     return {
       id: data.id,
       userId: data.user_id,
       title: data.title,
-      endpointType: data.endpoint_type,
+      endpointType: data.endpoint_type as Project['endpointType'],
       createdAt: new Date(data.created_at),
       updatedAt: new Date(data.updated_at)
     };
