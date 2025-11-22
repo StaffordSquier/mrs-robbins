@@ -68,7 +68,7 @@ export class SupabaseEmbeddingStorage implements EmbeddingStorage {
 
     if (error) throw error;
 
-    return data.map((row: any) => ({
+    return data.map((row: Record<string, any>) => ({
       contentId: row.content_id,
       chunkText: row.chunk_text,
       similarity: row.similarity,

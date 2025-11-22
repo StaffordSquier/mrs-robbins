@@ -75,7 +75,7 @@ export class SupabaseProjectService implements ProjectService {
   }
 
   async updateProject(id: string, params: UpdateProjectParams): Promise<Project> {
-    const updates: any = { updated_at: new Date().toISOString() };
+    const updates: Record<string, any> = { updated_at: new Date().toISOString() };
     if (params.title) updates.title = params.title;
     if (params.endpointType) updates.endpoint_type = params.endpointType;
 
@@ -100,7 +100,7 @@ export class SupabaseProjectService implements ProjectService {
     if (error) throw error;
   }
 
-  private mapToProject(data: any): Project {
+  private mapToProject(data: Record<string, any>): Project {
     return {
       id: data.id,
       userId: data.user_id,
