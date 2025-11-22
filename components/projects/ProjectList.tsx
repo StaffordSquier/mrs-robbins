@@ -7,7 +7,7 @@ import { useProjects } from '@/contexts/ProjectContext';
 import { Project } from '@/lib/projects';
 
 export function ProjectList() {
-  const { projects, currentProject, selectProject, createProject } = useProjects();
+  const { projects, currentProject, selectProject, createProject, loading, error } = useProjects();
   const [isCreating, setIsCreating] = useState(false);
   const [newTitle, setNewTitle] = useState('');
   const [newType, setNewType] = useState<Project['endpointType']>('writer');
@@ -18,6 +18,24 @@ export function ProjectList() {
     await createProject({ title: newTitle, endpointType: newType });
     setIsCreating(false);
     setNewTitle('');
+  }
+
+  if (loading) {
+    return (
+      <div className="space-y-4">
+        <h2 className="text-2xl font-bold">Projects</h2>
+        <div className="text-gray-600">Loading projects...</div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="space-y-4">
+        <h2 className="text-2xl font-bold">Projects</h2>
+        <div className="text-red-600">Error loading projects: {error.message}</div>
+      </div>
+    );
   }
 
   return (
