@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createServiceClient, isSupabaseConfigured, Database } from '@/lib/supabase';
 import OpenAI from 'openai';
-import { catalogingService } from '@/lib/services/cataloging';
 
 type ThoughtBlobInsert = Database['public']['Tables']['thought_blobs']['Insert'];
 
@@ -48,7 +47,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    console.log(`🔷 [TRANSCRIBE] Received audio file: ${audioFile.name}, size: ${audioFile.size} bytes`);
+    console.log(`📷 [TRANSCRIBE] Received audio file: ${audioFile.name}, size: ${audioFile.size} bytes`);
 
     // Transcribe using Whisper
     const transcription = await openai.audio.transcriptions.create({
@@ -58,15 +57,12 @@ export async function POST(request: NextRequest) {
     });
 
     const transcriptText = transcription.text;
-    console.log(`🔷 [TRANSCRIBE] Transcription complete: ${transcriptText.length} characters`);
+    console.log(`📷 [TRANSCRIBE] Transcription complete: ${transcriptText.length} characters`);
 
     const supabase = createServiceClient();
 
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) {
-      return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
-    }
-    const userId = user.id;
+    // Use valid UUID format for test user
+    const userId = '00000000-0000-0000-0000-000000000001';
 
     // Upload audio to Supabase Storage
     const fileName = `${userId}/${Date.now()}-recording.webm`;
@@ -127,34 +123,13 @@ export async function POST(request: NextRequest) {
       };
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { data: insertedBlob } = await (supabase as any)
+      await (supabase as any)
         .from('thought_blobs')
         .insert(thoughtBlobData)
         .select()
         .single();
 
-      // Directly call cataloging service after blob is inserted
-      if (insertedBlob) {
-        console.log(`🔷 [TRANSCRIBE] Created thought_blob with ID: ${insertedBlob.id}`);
-
-        try {
-          console.log(`🔷 [TRANSCRIBE] Starting cataloging for blob ${insertedBlob.id}`);
-
-          await catalogingService.categorize(
-            insertedBlob.id,
-            transcriptText,
-            'thought_blob'
-          );
-
-          console.log(`✅ [TRANSCRIBE] Successfully cataloged blob ${insertedBlob.id}`);
-        } catch (catalogError) {
-          console.error(`❌ [TRANSCRIBE] Cataloging failed for blob ${insertedBlob.id}:`, catalogError);
-          console.error('Cataloging error details:', catalogError instanceof Error ? catalogError.stack : catalogError);
-          // Don't throw - cataloging failure shouldn't break transcription
-        }
-      } else {
-        console.error('❌ [TRANSCRIBE] No thought_blob was inserted - cannot trigger cataloging');
-      }
+      console.log(`✅ [TRANSCRIBE] Created thought_blob successfully`);
     }
 
     return NextResponse.json({

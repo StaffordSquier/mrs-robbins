@@ -22,6 +22,7 @@ export default function Navigation() {
 
   return (
     <nav
+      suppressHydrationWarning
       style={{
         backgroundColor: 'white',
         borderBottom: '1px solid #E2E8F0',
@@ -44,12 +45,12 @@ export default function Navigation() {
                   key={link.href}
                   href={link.href}
                   style={{
-                    color: isActive ? '#0D9488' : '#4A5568',
+                    color: isActive ? '#2C7A7B' : '#4A5568',
                     fontWeight: isActive ? '600' : '500',
                     fontSize: '0.95rem',
                     textDecoration: 'none',
                     padding: '0.5rem 0',
-                    borderBottom: isActive ? '2px solid #0D9488' : '2px solid transparent',
+                    borderBottom: isActive ? '2px solid #2C7A7B' : '2px solid transparent',
                     transition: 'all 0.2s',
                     whiteSpace: 'nowrap',
                   }}
@@ -78,21 +79,21 @@ export default function Navigation() {
             <span style={{
               width: '24px',
               height: '3px',
-              backgroundColor: '#0D9488',
+              backgroundColor: '#2C7A7B',
               transition: 'all 0.3s',
               transform: mobileMenuOpen ? 'rotate(45deg) translateY(7px)' : 'none',
             }} />
             <span style={{
               width: '24px',
               height: '3px',
-              backgroundColor: '#0D9488',
+              backgroundColor: '#2C7A7B',
               transition: 'all 0.3s',
               opacity: mobileMenuOpen ? 0 : 1,
             }} />
             <span style={{
               width: '24px',
               height: '3px',
-              backgroundColor: '#0D9488',
+              backgroundColor: '#2C7A7B',
               transition: 'all 0.3s',
               transform: mobileMenuOpen ? 'rotate(-45deg) translateY(-7px)' : 'none',
             }} />
@@ -120,12 +121,12 @@ export default function Navigation() {
                   href={link.href}
                   onClick={() => setMobileMenuOpen(false)}
                   style={{
-                    color: isActive ? '#0D9488' : '#4A5568',
+                    color: isActive ? '#2C7A7B' : '#4A5568',
                     fontWeight: isActive ? '600' : '500',
                     fontSize: '0.95rem',
                     textDecoration: 'none',
                     padding: '0.75rem 0.5rem',
-                    borderLeft: isActive ? '3px solid #0D9488' : '3px solid transparent',
+                    borderLeft: isActive ? '3px solid #2C7A7B' : '3px solid transparent',
                     transition: 'all 0.2s',
                   }}
                 >

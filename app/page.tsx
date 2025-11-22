@@ -47,7 +47,7 @@ export default function MrsRobbinsConversation() {
   };
 
   const updateSlot = (id: string, field: 'variable' | 'value', value: string | number) => {
-    setSlots(slots.map(slot => 
+    setSlots(slots.map(slot =>
       slot.id === id ? { ...slot, [field]: value } : slot
     ));
   };
@@ -113,38 +113,50 @@ export default function MrsRobbinsConversation() {
   };
 
   return (
-    <div className="flex h-screen bg-[#F5F5F3]">
+    <div style={{ display: 'flex', height: 'calc(100vh - 73px)', backgroundColor: '#F5F5F3', padding: '16px', gap: '16px' }}>
       {/* Main Conversation Area */}
-      <div className="flex-1 flex flex-col">
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', backgroundColor: 'white', borderRadius: '8px', overflow: 'hidden' }}>
         {/* Header */}
-        <div className="bg-white border-b border-[#8A8A8A] p-4">
-          <h1 className="text-2xl font-semibold text-[#2B2B2B]">Mrs. Robbins</h1>
-          <p className="text-sm text-[#6A6A6A]">Your cognitive acceleration partner</p>
+        <div style={{ backgroundColor: 'white', borderBottom: '1px solid #8A8A8A', padding: '16px' }}>
+          <h1 style={{ fontSize: '24px', fontWeight: '600', color: '#2B2B2B', margin: 0 }}>Mrs. Robbins</h1>
+          <p style={{ fontSize: '14px', color: '#6A6A6A', margin: '4px 0 0 0' }}>Your cognitive acceleration partner</p>
         </div>
 
         {/* Messages */}
-        <div className="flex-1 overflow-y-auto p-6 space-y-4">
+        <div style={{ flex: 1, overflowY: 'auto', padding: '24px', backgroundColor: '#F5F5F3' }}>
           {messages.length === 0 && (
-            <div className="text-center mt-20">
-              <p className="text-[#6A6A6A] text-lg mb-2">Welcome to Mrs. Robbins</p>
-              <p className="text-[#8A8A8A]">Start a conversation to begin organizing your thoughts.</p>
+            <div style={{ textAlign: 'center', marginTop: '80px' }}>
+              <p style={{ color: '#6A6A6A', fontSize: '18px', marginBottom: '8px' }}>Welcome to Mrs. Robbins</p>
+              <p style={{ color: '#8A8A8A' }}>Start a conversation to begin organizing your thoughts.</p>
             </div>
           )}
 
           {messages.map((message) => (
             <div
               key={message.id}
-              className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
+              style={{
+                display: 'flex',
+                justifyContent: message.role === 'user' ? 'flex-end' : 'flex-start',
+                marginBottom: '16px'
+              }}
             >
               <div
-                className={`max-w-2xl rounded-lg p-4 ${
-                  message.role === 'user'
-                    ? 'bg-[#0D9488] text-white'
-                    : 'bg-white text-[#2B2B2B] border border-[#8A8A8A]'
-                }`}
+                style={{
+                  maxWidth: '800px',
+                  borderRadius: '8px',
+                  padding: '16px',
+                  backgroundColor: message.role === 'user' ? '#2C7A7B' : 'white',
+                  color: message.role === 'user' ? 'white' : '#2B2B2B',
+                  border: message.role === 'user' ? 'none' : '1px solid #8A8A8A'
+                }}
               >
-                <p className="whitespace-pre-wrap">{message.content}</p>
-                <p className={`text-xs mt-2 ${message.role === 'user' ? 'text-white/70' : 'text-[#8A8A8A]'}`}>
+                <p style={{ whiteSpace: 'pre-wrap', margin: 0 }}>{message.content}</p>
+                <p style={{
+                  fontSize: '12px',
+                  marginTop: '8px',
+                  color: message.role === 'user' ? 'rgba(255,255,255,0.7)' : '#8A8A8A',
+                  margin: '8px 0 0 0'
+                }}>
                   {message.timestamp.toLocaleTimeString()}
                 </p>
               </div>
@@ -152,9 +164,15 @@ export default function MrsRobbinsConversation() {
           ))}
 
           {isLoading && (
-            <div className="flex justify-start">
-              <div className="bg-white border border-[#8A8A8A] rounded-lg p-4 max-w-2xl">
-                <p className="text-[#6A6A6A]">Mrs. Robbins is thinking...</p>
+            <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
+              <div style={{
+                backgroundColor: 'white',
+                border: '1px solid #8A8A8A',
+                borderRadius: '8px',
+                padding: '16px',
+                maxWidth: '800px'
+              }}>
+                <p style={{ color: '#6A6A6A', margin: 0 }}>Mrs. Robbins is thinking...</p>
               </div>
             </div>
           )}
@@ -163,20 +181,38 @@ export default function MrsRobbinsConversation() {
         </div>
 
         {/* Input Area */}
-        <div className="bg-white border-t border-[#8A8A8A] p-4">
-          <div className="max-w-4xl mx-auto flex gap-3">
+        <div style={{ backgroundColor: 'white', borderTop: '1px solid #8A8A8A', padding: '16px' }}>
+          <div style={{ maxWidth: '1200px', margin: '0 auto', display: 'flex', gap: '12px' }}>
             <textarea
               value={inputText}
               onChange={(e) => setInputText(e.target.value)}
               onKeyPress={handleKeyPress}
               placeholder="Share your thoughts..."
-              className="flex-1 p-3 border border-[#8A8A8A] rounded-lg resize-none focus:ring-2 focus:ring-[#0D9488] focus:border-[#0D9488] text-[#2B2B2B]"
+              style={{
+                flex: 1,
+                padding: '12px',
+                border: '1px solid #8A8A8A',
+                borderRadius: '8px',
+                resize: 'none',
+                color: '#2B2B2B',
+                fontFamily: 'inherit',
+                fontSize: '14px'
+              }}
               rows={3}
             />
             <button
               onClick={sendMessage}
               disabled={!inputText.trim() || isLoading}
-              className="px-6 bg-[#0D9488] text-white font-medium rounded-lg hover:bg-[#0B7C73] disabled:bg-[#8A8A8A] disabled:cursor-not-allowed transition-colors"
+              style={{
+                padding: '0 24px',
+                backgroundColor: (!inputText.trim() || isLoading) ? '#8A8A8A' : '#2C7A7B',
+                color: 'white',
+                fontWeight: '500',
+                border: 'none',
+                borderRadius: '8px',
+                cursor: (!inputText.trim() || isLoading) ? 'not-allowed' : 'pointer',
+                fontSize: '16px'
+              }}
             >
               Send
             </button>
@@ -185,19 +221,32 @@ export default function MrsRobbinsConversation() {
       </div>
 
       {/* Voice Mixer Sidebar */}
-      <div className="w-80 bg-white border-l border-[#8A8A8A] p-6 overflow-y-auto">
-        <div className="mb-6">
-          <h2 className="text-lg font-semibold text-[#2B2B2B] mb-2">Voice Settings</h2>
-          <p className="text-sm text-[#6A6A6A]">Configure how Mrs. Robbins helps shape your writing</p>
+      <div style={{
+        width: '320px',
+        backgroundColor: 'white',
+        borderRadius: '8px',
+        padding: '24px',
+        overflowY: 'auto'
+      }}>
+        <div style={{ marginBottom: '24px' }}>
+          <h2 style={{ fontSize: '18px', fontWeight: '600', color: '#2B2B2B', marginBottom: '8px' }}>Voice Settings</h2>
+          <p style={{ fontSize: '14px', color: '#6A6A6A', margin: 0 }}>Configure how Mrs. Robbins helps shape your writing</p>
         </div>
 
-        <div className="space-y-4">
-          <div className="flex items-center justify-between mb-4">
-            <span className="text-sm font-medium text-[#2B2B2B]">{slots.length}/5 Variables</span>
+        <div>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
+            <span style={{ fontSize: '14px', fontWeight: '500', color: '#2B2B2B' }}>{slots.length}/5 Variables</span>
             {slots.length < 5 && (
               <button
                 onClick={addSlot}
-                className="text-sm text-[#0D9488] hover:text-[#0B7C73] font-medium"
+                style={{
+                  fontSize: '14px',
+                  color: '#2C7A7B',
+                  fontWeight: '500',
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer'
+                }}
               >
                 + Add
               </button>
@@ -205,13 +254,19 @@ export default function MrsRobbinsConversation() {
           </div>
 
           {slots.map((slot, index) => (
-            <div key={slot.id} className="p-4 bg-[#F5F5F3] rounded-lg">
-              <div className="flex items-center justify-between mb-3">
-                <span className="text-sm font-medium text-[#2B2B2B]">Variable {index + 1}</span>
+            <div key={slot.id} style={{ padding: '16px', backgroundColor: '#F5F5F3', borderRadius: '8px', marginBottom: '16px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
+                <span style={{ fontSize: '14px', fontWeight: '500', color: '#2B2B2B' }}>Variable {index + 1}</span>
                 {slots.length > 1 && (
                   <button
                     onClick={() => removeSlot(slot.id)}
-                    className="text-sm text-[#DC2626] hover:text-[#B91C1C]"
+                    style={{
+                      fontSize: '14px',
+                      color: '#DC2626',
+                      background: 'none',
+                      border: 'none',
+                      cursor: 'pointer'
+                    }}
                   >
                     Remove
                   </button>
@@ -221,7 +276,17 @@ export default function MrsRobbinsConversation() {
               <select
                 value={slot.variable}
                 onChange={(e) => updateSlot(slot.id, 'variable', e.target.value)}
-                className="w-full p-2 border border-[#8A8A8A] rounded-md mb-3 text-[#2B2B2B] font-medium bg-white focus:ring-2 focus:ring-[#0D9488] focus:border-[#0D9488]"
+                style={{
+                  width: '100%',
+                  padding: '8px',
+                  border: '1px solid #8A8A8A',
+                  borderRadius: '6px',
+                  marginBottom: '12px',
+                  color: '#2B2B2B',
+                  fontWeight: '500',
+                  backgroundColor: 'white',
+                  fontSize: '14px'
+                }}
               >
                 <option value="formality">Formality</option>
                 <option value="complexity">Complexity</option>
@@ -231,9 +296,9 @@ export default function MrsRobbinsConversation() {
               </select>
 
               <div>
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-xs text-[#4A4A4A]">Value</span>
-                  <span className="text-xs font-medium text-[#2B2B2B]">{slot.value}/10</span>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+                  <span style={{ fontSize: '12px', color: '#4A4A4A' }}>Value</span>
+                  <span style={{ fontSize: '12px', fontWeight: '500', color: '#2B2B2B' }}>{slot.value}/10</span>
                 </div>
                 <input
                   type="range"
@@ -241,7 +306,12 @@ export default function MrsRobbinsConversation() {
                   max="10"
                   value={slot.value}
                   onChange={(e) => updateSlot(slot.id, 'value', parseInt(e.target.value))}
-                  className="w-full h-2 bg-[#8A8A8A] rounded-lg appearance-none cursor-pointer accent-[#0D9488]"
+                  style={{
+                    width: '100%',
+                    height: '8px',
+                    cursor: 'pointer',
+                    accentColor: '#2C7A7B'
+                  }}
                 />
               </div>
             </div>

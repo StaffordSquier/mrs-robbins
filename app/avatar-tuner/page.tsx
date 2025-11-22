@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { translateToVoice } from '@/lib/voice';
 
 interface VoiceSlot {
   id: string;
@@ -74,50 +73,81 @@ export default function AvatarTuner() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F5F5F3] p-8">
-      <div className="max-w-7xl mx-auto">
-        <h1 className="text-3xl font-semibold text-[#2B2B2B] mb-2">Avatar Tuner</h1>
-        <p className="text-[#6A6A6A] mb-8">Configure voice parameters and test output</p>
+    <div style={{ minHeight: '100vh', backgroundColor: '#F5F5F3', padding: '32px' }}>
+      <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
+        <h1 style={{ fontSize: '30px', fontWeight: '600', color: '#2B2B2B', marginBottom: '8px' }}>
+          Avatar Tuner
+        </h1>
+        <p style={{ color: '#6A6A6A', marginBottom: '32px' }}>
+          Configure voice parameters and test output
+        </p>
 
-        <div className="grid grid-cols-2 gap-8">
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '32px' }}>
           {/* Left Panel - Input & Controls */}
-          <div className="space-y-6">
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
             <div>
-              <label className="block text-sm font-medium text-[#2B2B2B] mb-2">
+              <label style={{ display: 'block', fontSize: '14px', fontWeight: '500', color: '#2B2B2B', marginBottom: '8px' }}>
                 Baseline Text
               </label>
               <textarea
                 value={baselineText}
                 onChange={(e) => setBaselineText(e.target.value)}
-                className="w-full h-32 min-h-[128px] p-3 border border-[#8A8A8A] rounded-md resize-y focus:ring-2 focus:ring-[#0D9488] focus:border-[#0D9488] text-[#2B2B2B] bg-white"
+                style={{
+                  width: '100%',
+                  height: '128px',
+                  padding: '12px',
+                  border: '1px solid #8A8A8A',
+                  borderRadius: '6px',
+                  fontSize: '14px',
+                  color: '#2B2B2B',
+                  backgroundColor: 'white',
+                  resize: 'vertical',
+                  fontFamily: 'inherit'
+                }}
                 placeholder="Enter your baseline text here..."
               />
             </div>
 
             <div>
-              <div className="flex items-center justify-between mb-3">
-                <label className="text-sm font-medium text-[#2B2B2B]">
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
+                <label style={{ fontSize: '14px', fontWeight: '500', color: '#2B2B2B' }}>
                   Voice Mixer ({slots.length}/5 slots)
                 </label>
                 {slots.length < 5 && (
                   <button
                     onClick={addSlot}
-                    className="px-3 py-1 text-sm bg-[#0D9488] text-white rounded-md hover:bg-[#0B7C73] transition-colors"
+                    style={{
+                      padding: '4px 12px',
+                      fontSize: '14px',
+                      backgroundColor: '#2C7A7B',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '6px',
+                      cursor: 'pointer'
+                    }}
                   >
                     + Add Slot
                   </button>
                 )}
               </div>
 
-              <div className="space-y-4">
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                 {slots.map((slot, index) => (
-                  <div key={slot.id} className="p-4 bg-white rounded-md border border-[#8A8A8A]">
-                    <div className="flex items-center justify-between mb-3">
-                      <span className="text-sm font-medium text-[#2B2B2B]">Slot {index + 1}</span>
+                  <div key={slot.id} style={{ padding: '16px', backgroundColor: 'white', borderRadius: '6px', border: '1px solid #8A8A8A' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
+                      <span style={{ fontSize: '14px', fontWeight: '500', color: '#2B2B2B' }}>
+                        Slot {index + 1}
+                      </span>
                       {slots.length > 1 && (
                         <button
                           onClick={() => removeSlot(slot.id)}
-                          className="text-sm text-[#DC2626] hover:text-[#B91C1C]"
+                          style={{
+                            fontSize: '14px',
+                            color: '#DC2626',
+                            background: 'none',
+                            border: 'none',
+                            cursor: 'pointer'
+                          }}
                         >
                           Remove
                         </button>
@@ -127,7 +157,17 @@ export default function AvatarTuner() {
                     <select
                       value={slot.variable}
                       onChange={(e) => updateSlot(slot.id, 'variable', e.target.value)}
-                      className="w-full p-2 border border-[#8A8A8A] rounded-md mb-3 text-[#2B2B2B] font-medium bg-white focus:ring-2 focus:ring-[#0D9488] focus:border-[#0D9488]"
+                      style={{
+                        width: '100%',
+                        padding: '8px',
+                        border: '1px solid #8A8A8A',
+                        borderRadius: '6px',
+                        marginBottom: '12px',
+                        color: '#2B2B2B',
+                        fontWeight: '500',
+                        backgroundColor: 'white',
+                        fontSize: '14px'
+                      }}
                     >
                       <option value="formality">Formality</option>
                       <option value="complexity">Complexity</option>
@@ -137,9 +177,11 @@ export default function AvatarTuner() {
                     </select>
 
                     <div>
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="text-sm text-[#4A4A4A]">Value</span>
-                        <span className="text-sm font-medium text-[#2B2B2B]">{slot.value}/10</span>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+                        <span style={{ fontSize: '14px', color: '#4A4A4A' }}>Value</span>
+                        <span style={{ fontSize: '14px', fontWeight: '500', color: '#2B2B2B' }}>
+                          {slot.value}/10
+                        </span>
                       </div>
                       <input
                         type="range"
@@ -147,9 +189,14 @@ export default function AvatarTuner() {
                         max="10"
                         value={slot.value}
                         onChange={(e) => updateSlot(slot.id, 'value', parseInt(e.target.value))}
-                        className="w-full h-2 bg-[#8A8A8A] rounded-lg appearance-none cursor-pointer accent-[#0D9488]"
+                        style={{
+                          width: '100%',
+                          height: '8px',
+                          cursor: 'pointer',
+                          accentColor: '#2C7A7B'
+                        }}
                       />
-                      <p className="text-xs text-[#6A6A6A] mt-2">
+                      <p style={{ fontSize: '12px', color: '#6A6A6A', marginTop: '8px' }}>
                         Controls casual vs. formal language style
                       </p>
                     </div>
@@ -161,7 +208,17 @@ export default function AvatarTuner() {
             <button
               onClick={testVoice}
               disabled={!baselineText.trim() || isLoading}
-              className="w-full py-3 bg-[#0D9488] text-white font-medium rounded-md hover:bg-[#0B7C73] disabled:bg-[#8A8A8A] disabled:cursor-not-allowed transition-colors"
+              style={{
+                width: '100%',
+                padding: '12px',
+                backgroundColor: (!baselineText.trim() || isLoading) ? '#8A8A8A' : '#2C7A7B',
+                color: 'white',
+                fontWeight: '500',
+                border: 'none',
+                borderRadius: '6px',
+                cursor: (!baselineText.trim() || isLoading) ? 'not-allowed' : 'pointer',
+                fontSize: '16px'
+              }}
             >
               {isLoading ? 'Testing Voice...' : 'Test Voice'}
             </button>
@@ -169,16 +226,25 @@ export default function AvatarTuner() {
 
           {/* Right Panel - Output */}
           <div>
-            <label className="block text-sm font-medium text-[#2B2B2B] mb-2">
+            <label style={{ display: 'block', fontSize: '14px', fontWeight: '500', color: '#2B2B2B', marginBottom: '8px' }}>
               Tuned Output
             </label>
-            <div className="h-[600px] p-4 bg-white border border-[#8A8A8A] rounded-md overflow-y-auto resize-y">
+            <div style={{
+              height: '600px',
+              padding: '16px',
+              backgroundColor: 'white',
+              border: '1px solid #8A8A8A',
+              borderRadius: '6px',
+              overflowY: 'auto'
+            }}>
               {tunedOutput ? (
-                <div className="prose prose-sm max-w-none">
-                  <p className="text-[#2B2B2B] whitespace-pre-wrap">{tunedOutput}</p>
-                </div>
+                <p style={{ color: '#2B2B2B', whiteSpace: 'pre-wrap', lineHeight: '1.6', margin: 0 }}>
+                  {tunedOutput}
+                </p>
               ) : (
-                <p className="text-[#6A6A6A] italic">Output will appear here after testing</p>
+                <p style={{ color: '#6A6A6A', fontStyle: 'italic', margin: 0 }}>
+                  Output will appear here after testing
+                </p>
               )}
             </div>
           </div>
