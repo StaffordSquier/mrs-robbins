@@ -474,7 +474,7 @@ jobs:
           fi
           
           # Must have error handling
-          if ! grep -q "try.*catch" "$route_file"; then
+          if ! grep -q "try" "$route_file" || ! grep -q "catch" "$route_file"; then
             echo "❌ $route_file must have try/catch error handling"
             exit 1
           fi
