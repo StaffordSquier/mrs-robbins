@@ -46,15 +46,36 @@ export class OpenAIEmbeddingService implements EmbeddingService {
     const sentences = text.split(/[.!?]+\s+/);
 
     for (const sentence of sentences) {
-      if ((currentChunk + sentence).length > maxChars && currentChunk.length > 0) {
-        chunks.push(currentChunk.trim());
-        currentChunk = sentence;
+      // If sentence itself is too long, split by words
+      if (sentence.length > maxChars) {
+        // Flush current chunk if it has content
+        if (currentChunk.trim()) {
+          chunks.push(currentChunk.trim());
+          currentChunk = '';
+        }
+
+        // Split long sentence by words
+        const words = sentence.split(/\s+/);
+        for (const word of words) {
+          if ((currentChunk + ' ' + word).length > maxChars && currentChunk.length > 0) {
+            chunks.push(currentChunk.trim());
+            currentChunk = word;
+          } else {
+            currentChunk += (currentChunk ? ' ' : '') + word;
+          }
+        }
       } else {
-        currentChunk += (currentChunk ? ' ' : '') + sentence;
+        // Normal sentence handling
+        if ((currentChunk + sentence).length > maxChars && currentChunk.length > 0) {
+          chunks.push(currentChunk.trim());
+          currentChunk = sentence;
+        } else {
+          currentChunk += (currentChunk ? ' ' : '') + sentence;
+        }
       }
     }
 
-    if (currentChunk) {
+    if (currentChunk.trim()) {
       chunks.push(currentChunk.trim());
     }
 
