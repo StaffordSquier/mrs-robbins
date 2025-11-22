@@ -1,7 +1,7 @@
 {
   "info": {
     "name": "Mrs Robbins API Tests",
-    "description": "Automated API tests for Mrs Robbins platform",
+    "description": "Automated API tests for Mrs Robbins platform - Phase 1 endpoints only",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
@@ -12,51 +12,6 @@
     }
   ],
   "item": [
-    {
-      "name": "Conversation API",
-      "request": {
-        "method": "POST",
-        "header": [
-          {
-            "key": "Content-Type",
-            "value": "application/json"
-          }
-        ],
-        "body": {
-          "mode": "raw",
-          "raw": "{\n  \"messages\": [\n    {\n      \"role\": \"user\",\n      \"content\": \"I want to write about my experience growing up in Texas.\"\n    }\n  ],\n  \"voiceConfig\": {\n    \"formality\": 5,\n    \"complexity\": 5,\n    \"emotionality\": 5\n  }\n}"
-        },
-        "url": {
-          "raw": "{{baseUrl}}/api/conversation",
-          "host": ["{{baseUrl}}"],
-          "path": ["api", "conversation"]
-        }
-      },
-      "event": [
-        {
-          "listen": "test",
-          "script": {
-            "exec": [
-              "pm.test(\"Status code is 200\", function () {",
-              "    pm.response.to.have.status(200);",
-              "});",
-              "",
-              "pm.test(\"Response has valid structure\", function () {",
-              "    var jsonData = pm.response.json();",
-              "    pm.expect(jsonData).to.have.property('response');",
-              "    pm.expect(jsonData.response).to.be.a('string');",
-              "    pm.expect(jsonData.response.length).to.be.above(0);",
-              "});",
-              "",
-              "pm.test(\"Response time is acceptable\", function () {",
-              "    pm.expect(pm.response.responseTime).to.be.below(10000);",
-              "});"
-            ],
-            "type": "text/javascript"
-          }
-        }
-      ]
-    },
     {
       "name": "Evaluate Voice API",
       "request": {

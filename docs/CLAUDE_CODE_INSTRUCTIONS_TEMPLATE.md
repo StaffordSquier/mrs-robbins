@@ -1,6 +1,6 @@
 # Claude Code Instructions Template
 
-**Version:** 1.1  
+**Version:** 1.2  
 **Purpose:** Standardized format for all Claude Code instructions to prevent scope creep, config rot, and undisciplined changes.
 
 ---
@@ -88,6 +88,7 @@ EXCEPTION: If verification reveals bugs in excluded files, you ARE ALLOWED to fi
 **Example:**
 ```
 DO NOT TOUCH:
+- .github/workflows/ci.yml - CI/CD checks are the independent quality gate (NEVER modify)
 - next.config.js - deployment config is stable
 - tailwind.config.ts - styling config is working
 - tsconfig.json - TypeScript config is correct
@@ -97,7 +98,10 @@ DO NOT TOUCH:
 
 These are WORKING and must remain unchanged.
 
-EXCEPTION: If tests fail because of bugs in these files (not because tests are wrong),
+CRITICAL: .github/workflows/ci.yml has NO EXCEPTIONS. Never modify CI/CD checks.
+If a check is wrong, STOP and report it. Only humans can modify quality gates.
+
+EXCEPTION for other files: If tests fail because of bugs in these files (not because tests are wrong),
 you ARE ALLOWED to fix the bugs. Example: if lib/embeddings.ts has a chunking bug
 that a test correctly identifies, fix the bug in lib/embeddings.ts.
 ```
@@ -314,6 +318,7 @@ This template will evolve as we learn what works:
 - Testing reveals gaps in instructions
 
 **Version history:**
+- v1.2 (Nov 22, 2025) - CRITICAL: Added .github/workflows/ci.yml to exclusions with NO EXCEPTIONS - Claude Code can never modify CI/CD checks
 - v1.1 (Nov 22, 2025) - Added clarification to Section 3: "DO NOT TOUCH" excludes refactoring but allows bug fixes revealed by tests/verification
 - v1.0 (Nov 22, 2025) - Initial template created after Phase 1 Jest issue
 
