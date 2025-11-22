@@ -48,7 +48,8 @@
       "Bash(pkill:*)",
       "Bash(yes no)",
       "Bash(cp:*)",
-      "Bash(rm:*)"
+      "Bash(rm:*)",
+      "Bash(git reset:*)"
     ],
     "deny": [],
     "ask": []
