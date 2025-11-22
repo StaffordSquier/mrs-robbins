@@ -31,7 +31,15 @@ export async function POST(request: NextRequest) {
 }
 
 async function testCataloging(text: string) {
-  const result: any = {
+  const result: {
+    timestamp: string;
+    input: { text: string; length: number };
+    environment: Record<string, string>;
+    vocabularyCheck: Record<string, unknown>;
+    catalogingResult: unknown;
+    databaseCheck: Record<string, unknown>;
+    error: { message: string; stack?: string } | null;
+  } = {
     timestamp: new Date().toISOString(),
     input: {
       text,

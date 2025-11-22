@@ -49,7 +49,7 @@ export async function POST(request: NextRequest) {
     const buffer = Buffer.from(arrayBuffer);
 
     // Upload to Supabase Storage
-    const { data: uploadData, error: uploadError } = await supabase.storage
+    const { data: _uploadData, error: uploadError } = await supabase.storage
       .from('voice-memos')
       .upload(storagePath, buffer, {
         contentType: audioFile.type || 'audio/webm',

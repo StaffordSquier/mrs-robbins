@@ -435,7 +435,7 @@ Example output: ["love", "loss", "journey", "hope"]`,
         input: query,
       });
 
-      const queryEmbedding = response.data[0].embedding;
+      const _queryEmbedding = response.data[0].embedding;
 
       // Search for similar embeddings
       // Note: This requires pgvector extension and proper indexing

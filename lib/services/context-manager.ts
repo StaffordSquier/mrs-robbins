@@ -176,7 +176,7 @@ export interface ContextStats {
  * ```
  */
 export async function buildContext(
-  request: ContextRequest
+  _request: ContextRequest
 ): Promise<OptimizedContext> {
   // TODO: Implement context building
   // - Gather hot context
@@ -194,7 +194,7 @@ export async function buildContext(
  * @returns Promise resolving to success boolean
  */
 export async function addToHotContext(
-  input: HotContextInput
+  _input: HotContextInput
 ): Promise<boolean> {
   // TODO: Implement hot context addition
   // - Store in hot cache
@@ -211,8 +211,8 @@ export async function addToHotContext(
  * @returns Promise resolving to success boolean
  */
 export async function promoteContext(
-  id: string,
-  targetTemperature: 'hot' | 'warm'
+  _id: string,
+  _targetTemperature: 'hot' | 'warm'
 ): Promise<boolean> {
   // TODO: Implement context promotion
   // - Move from cold/warm storage
@@ -227,7 +227,7 @@ export async function promoteContext(
  * @returns Promise resolving to new temperature
  */
 export async function demoteContext(
-  id: string
+  _id: string
 ): Promise<ContextTemperature> {
   // TODO: Implement context demotion
   // - Check access patterns
@@ -243,8 +243,8 @@ export async function demoteContext(
  * @returns Promise resolving to context hierarchy
  */
 export async function getHierarchicalContext(
-  contextId: string,
-  level: HierarchicalContextInput['level']
+  _contextId: string,
+  _level: HierarchicalContextInput['level']
 ): Promise<ContextHierarchyNode> {
   // TODO: Implement hierarchical context retrieval
   // - Build hierarchy tree
@@ -260,7 +260,7 @@ export async function getHierarchicalContext(
  * @returns Promise resolving to created node
  */
 export async function setHierarchicalContext(
-  input: HierarchicalContextInput
+  _input: HierarchicalContextInput
 ): Promise<ContextHierarchyNode> {
   // TODO: Implement hierarchical context setting
   // - Validate hierarchy
@@ -275,7 +275,7 @@ export async function setHierarchicalContext(
  * @param id - Context ID to invalidate
  * @returns Promise resolving to success boolean
  */
-export async function invalidateContext(id: string): Promise<boolean> {
+export async function invalidateContext(_id: string): Promise<boolean> {
   // TODO: Implement context invalidation
   throw new Error('Not implemented');
 }
@@ -287,7 +287,7 @@ export async function invalidateContext(id: string): Promise<boolean> {
  * @returns Promise resolving to stats
  */
 export async function getContextStats(
-  userId: string
+  _userId: string
 ): Promise<ContextStats> {
   // TODO: Implement stats retrieval
   throw new Error('Not implemented');
@@ -302,8 +302,8 @@ export async function getContextStats(
  * @returns Promise resolving to compressed context string
  */
 export async function compressContext(
-  contexts: ContextItem[],
-  targetTokens: number
+  _contexts: ContextItem[],
+  _targetTokens: number
 ): Promise<string> {
   // TODO: Implement context compression
   // - Identify key information

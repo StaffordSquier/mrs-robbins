@@ -53,7 +53,18 @@ export async function GET(request: NextRequest) {
     }>;
 
     // Build hierarchical tree structure
-    const buildTree = (parentId: string | null = null): any[] => {
+    type TreeNode = {
+      id: string;
+      vocabulary_set_id: string;
+      term: string;
+      parent_id: string | null;
+      synonyms: string[] | null;
+      description: string | null;
+      created_at: string;
+      children: TreeNode[];
+    };
+
+    const buildTree = (parentId: string | null = null): TreeNode[] => {
       return typedTerms
         .filter(t => t.parent_id === parentId)
         .map(term => ({

@@ -233,7 +233,7 @@ export interface DialecticalSessionState {
  * ```
  */
 export async function processDialecticalInput(
-  input: DialecticalInput
+  _input: DialecticalInput
 ): Promise<DialecticalResponse> {
   // TODO: Implement dialectical processing
   // - Analyze user input
@@ -250,7 +250,7 @@ export async function processDialecticalInput(
  * @returns Promise resolving to structural analysis
  */
 export async function analyzeStructure(
-  input: StructuralAnalysisInput
+  _input: StructuralAnalysisInput
 ): Promise<StructuralAnalysis> {
   // TODO: Implement structural analysis
   // - Parse content for themes
@@ -267,7 +267,7 @@ export async function analyzeStructure(
  * @returns Promise resolving to synthesis
  */
 export async function generateSynthesis(
-  request: SynthesisRequest
+  _request: SynthesisRequest
 ): Promise<SynthesisOutput> {
   // TODO: Implement synthesis generation
   // - Identify compatible elements
@@ -284,7 +284,7 @@ export async function generateSynthesis(
  * @returns Promise resolving to session state
  */
 export async function getSessionState(
-  sessionId: string
+  _sessionId: string
 ): Promise<DialecticalSessionState> {
   // TODO: Implement state retrieval
   // - Load session from database
@@ -300,8 +300,8 @@ export async function getSessionState(
  * @returns Promise resolving to new session ID
  */
 export async function createSession(
-  projectId: string,
-  userId: string
+  _projectId: string,
+  _userId: string
 ): Promise<string> {
   // TODO: Implement session creation
   // - Generate session ID
@@ -318,8 +318,8 @@ export async function createSession(
  * @returns Promise resolving to success boolean
  */
 export async function transitionPhase(
-  sessionId: string,
-  targetPhase: DialecticalPhase
+  _sessionId: string,
+  _targetPhase: DialecticalPhase
 ): Promise<boolean> {
   // TODO: Implement phase transition
   // - Validate transition is allowed
@@ -336,8 +336,8 @@ export async function transitionPhase(
  * @returns Promise resolving to generated document
  */
 export async function generateDocument(
-  sessionId: string,
-  format: StructuralAnalysisInput['targetFormat']
+  _sessionId: string,
+  _format: StructuralAnalysisInput['targetFormat']
 ): Promise<{
   content: string;
   structure: StructuralAnalysis['proposedStructure'];
@@ -359,8 +359,8 @@ export async function generateDocument(
  * @returns Promise resolving to exchange history
  */
 export async function getHistory(
-  sessionId: string,
-  limit?: number
+  _sessionId: string,
+  _limit?: number
 ): Promise<DialecticalExchange[]> {
   // TODO: Implement history retrieval
   throw new Error('Not implemented');

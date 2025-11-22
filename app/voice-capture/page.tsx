@@ -14,7 +14,7 @@ export default function VoiceCapture() {
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
   const [projects, setProjects] = useState<Project[]>([]);
   const [selectedProjectId, setSelectedProjectId] = useState<string>('');
-  const [isUploading, setIsUploading] = useState(false);
+  const [isUploading, _setIsUploading] = useState(false);
   const [isTranscribing, setIsTranscribing] = useState(false);
   const [transcript, setTranscript] = useState<string>('');
   const [status, setStatus] = useState<string>('');

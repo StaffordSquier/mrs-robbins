@@ -127,7 +127,7 @@ export interface ContentQueryResult {
  * ```
  */
 export async function collectContent(
-  input: ContentInput
+  _input: ContentInput
 ): Promise<ContentCollectionResult> {
   // TODO: Implement content storage
   // - Validate input
@@ -144,7 +144,7 @@ export async function collectContent(
  * @returns Promise resolving to query results
  */
 export async function queryContent(
-  query: ContentQueryInput
+  _query: ContentQueryInput
 ): Promise<ContentQueryResult> {
   // TODO: Implement content retrieval
   // - Build database query
@@ -160,7 +160,7 @@ export async function queryContent(
  * @returns Promise resolving to blob or null
  */
 export async function getContentById(
-  id: string
+  _id: string
 ): Promise<ContentBlob | null> {
   // TODO: Implement single blob retrieval
   throw new Error('Not implemented');
@@ -174,8 +174,8 @@ export async function getContentById(
  * @returns Promise resolving to updated blob
  */
 export async function updateContent(
-  id: string,
-  updates: Partial<Pick<ContentBlob, 'tags' | 'metadata' | 'projectId'>>
+  _id: string,
+  _updates: Partial<Pick<ContentBlob, 'tags' | 'metadata' | 'projectId'>>
 ): Promise<ContentBlob> {
   // TODO: Implement content updates
   throw new Error('Not implemented');
@@ -187,7 +187,7 @@ export async function updateContent(
  * @param id - Blob identifier
  * @returns Promise resolving to success boolean
  */
-export async function deleteContent(id: string): Promise<boolean> {
+export async function deleteContent(_id: string): Promise<boolean> {
   // TODO: Implement content deletion
   // - Remove from database
   // - Clean up embeddings

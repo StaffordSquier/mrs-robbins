@@ -148,7 +148,7 @@ export interface EmbeddingIndexStats {
  * ```
  */
 export async function createEmbedding(
-  input: EmbedInput
+  _input: EmbedInput
 ): Promise<EmbeddingResult> {
   // TODO: Implement embedding creation
   // - Call OpenAI embeddings API
@@ -164,7 +164,7 @@ export async function createEmbedding(
  * @returns Promise resolving to batch result
  */
 export async function createBatchEmbeddings(
-  inputs: EmbedInput[]
+  _inputs: EmbedInput[]
 ): Promise<BatchEmbeddingResult> {
   // TODO: Implement batch embedding
   // - Process in chunks to respect rate limits
@@ -180,7 +180,7 @@ export async function createBatchEmbeddings(
  * @returns Promise resolving to search results
  */
 export async function semanticSearch(
-  query: SemanticSearchInput
+  _query: SemanticSearchInput
 ): Promise<SemanticSearchResult[]> {
   // TODO: Implement semantic search
   // - Embed query text
@@ -197,7 +197,7 @@ export async function semanticSearch(
  * @returns Promise resolving to similar items
  */
 export async function findSimilarContent(
-  input: SimilarContentInput
+  _input: SimilarContentInput
 ): Promise<SemanticSearchResult[]> {
   // TODO: Implement similarity search
   // - Get embedding for source content
@@ -213,7 +213,7 @@ export async function findSimilarContent(
  * @returns Promise resolving to new embedding result
  */
 export async function updateEmbedding(
-  input: EmbedInput
+  _input: EmbedInput
 ): Promise<EmbeddingResult> {
   // TODO: Implement embedding update
   // - Delete old embedding
@@ -228,7 +228,7 @@ export async function updateEmbedding(
  * @param id - Content ID to remove
  * @returns Promise resolving to success boolean
  */
-export async function deleteEmbedding(id: string): Promise<boolean> {
+export async function deleteEmbedding(_id: string): Promise<boolean> {
   // TODO: Implement embedding deletion
   throw new Error('Not implemented');
 }

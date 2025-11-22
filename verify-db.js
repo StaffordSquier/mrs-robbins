@@ -5,6 +5,7 @@
  * Connects to Supabase and verifies migrations have been applied
  */
 
+// eslint-disable-next-line @typescript-eslint/no-require-imports
 const { createClient } = require('@supabase/supabase-js');
 
 // Read environment variables
@@ -29,7 +30,7 @@ async function verifyDatabase() {
   // 1. Check if controlled_vocabulary table exists
   console.log('📊 1. Checking controlled_vocabulary table...');
   try {
-    const { data: vocabData, error: vocabError } = await supabase
+    const { data: _vocabData, error: vocabError } = await supabase
       .from('controlled_vocabulary')
       .select('*')
       .limit(1);
@@ -49,7 +50,7 @@ async function verifyDatabase() {
   // 2. Check if content_metadata table exists
   console.log('📊 2. Checking content_metadata table...');
   try {
-    const { data: metadataData, error: metadataError } = await supabase
+    const { data: _metadataData, error: metadataError } = await supabase
       .from('content_metadata')
       .select('*')
       .limit(1);
@@ -142,7 +143,7 @@ async function verifyDatabase() {
   // 6. Check embeddings table
   console.log('📊 6. Checking embeddings table...');
   try {
-    const { data: embeddingsData, error: embeddingsError } = await supabase
+    const { data: _embeddingsData, error: embeddingsError } = await supabase
       .from('embeddings')
       .select('*')
       .limit(1);

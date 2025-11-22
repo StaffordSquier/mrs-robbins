@@ -9,7 +9,17 @@ import { createServiceClient } from '@/lib/supabase';
  */
 
 export async function GET() {
-  const diagnostics: any = {
+  const diagnostics: {
+    timestamp: string;
+    environment: Record<string, string>;
+    recentBlobs: unknown[];
+    recentTags: unknown[];
+    recentBlobsError?: string;
+    recentTagsError?: string;
+    vocabularyCountError?: string;
+    vocabularyTermsCount?: number | null;
+    error?: string;
+  } = {
     timestamp: new Date().toISOString(),
     environment: {
       ANTHROPIC_API_KEY: process.env.ANTHROPIC_API_KEY ? '✅ Set (' + process.env.ANTHROPIC_API_KEY.substring(0, 20) + '...)' : '❌ Not set',

@@ -8,7 +8,7 @@ export interface ErrorLogEntry {
   operation?: string;
   errorMessage: string;
   errorStack?: string;
-  errorData?: any;
+  errorData?: Record<string, unknown>;
 }
 
 /**
@@ -69,7 +69,7 @@ export async function logInfo(
   errorType: string,
   operation: string,
   message: string,
-  data?: any
+  data?: Record<string, unknown>
 ): Promise<void> {
   await logError({
     errorType,

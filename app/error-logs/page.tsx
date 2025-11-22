@@ -14,7 +14,7 @@ interface ErrorLog {
   operation: string | null;
   error_message: string;
   error_stack: string | null;
-  error_data: any;
+  error_data: Record<string, unknown> | null;
   environment: string;
 }
 

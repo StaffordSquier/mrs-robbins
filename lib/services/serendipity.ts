@@ -184,7 +184,7 @@ export interface PatternAnalysisResult {
  * ```
  */
 export async function discoverConnections(
-  input: DiscoveryInput
+  _input: DiscoveryInput
 ): Promise<DiscoveryResult> {
   // TODO: Implement serendipity discovery
   // - Get content and embeddings
@@ -201,7 +201,7 @@ export async function discoverConnections(
  * @returns Promise resolving to batch results
  */
 export async function discoverBatch(
-  input: BatchDiscoveryInput
+  _input: BatchDiscoveryInput
 ): Promise<BatchDiscoveryResult> {
   // TODO: Implement batch discovery
   // - Process multiple contents
@@ -217,7 +217,7 @@ export async function discoverBatch(
  * @returns Promise resolving to pattern analysis
  */
 export async function analyzePatterns(
-  input: PatternSearchInput
+  _input: PatternSearchInput
 ): Promise<PatternAnalysisResult> {
   // TODO: Implement pattern analysis
   // - Scan content for recurring themes
@@ -234,7 +234,7 @@ export async function analyzePatterns(
  * @returns Promise resolving to daily connections
  */
 export async function getDailySuggestions(
-  userId: string
+  _userId: string
 ): Promise<SerendipitousConnection[]> {
   // TODO: Implement daily suggestions
   // - Analyze recent user content
@@ -251,8 +251,8 @@ export async function getDailySuggestions(
  * @returns Promise resolving to success boolean
  */
 export async function rateConnection(
-  connectionId: string,
-  valuable: boolean
+  _connectionId: string,
+  _valuable: boolean
 ): Promise<boolean> {
   // TODO: Implement connection rating
   // - Store user feedback
@@ -269,7 +269,7 @@ export async function rateConnection(
  * @returns Promise resolving to breakthrough detection
  */
 export async function detectBreakthrough(
-  contentIds: string[]
+  _contentIds: string[]
 ): Promise<{
   isBreakthrough: boolean;
   confidence: number;

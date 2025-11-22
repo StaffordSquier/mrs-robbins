@@ -1,0 +1,101 @@
+
+> mrs-robbins@0.1.0 lint
+> eslint
+
+
+C:\projects\mrs-robbins\app\api\catalog\vocabulary\route.ts
+  56:57  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\projects\mrs-robbins\app\api\catalog\vocabulary\term\[id]\route.ts
+  22:23  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\projects\mrs-robbins\app\api\debug\catalog\route.ts
+  12:22  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\projects\mrs-robbins\app\api\test-catalog\route.ts
+  34:17  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\projects\mrs-robbins\app\api\voice\transcribe\route.ts
+  69:19  warning  'uploadData' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+C:\projects\mrs-robbins\app\api\voice\upload\route.ts
+  52:19  warning  'uploadData' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+C:\projects\mrs-robbins\app\error-logs\page.tsx
+  17:15  error    Unexpected any. Specify a different type                                                                          @typescript-eslint/no-explicit-any
+  29:6   warning  React Hook useEffect has a missing dependency: 'loadErrorLogs'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\projects\mrs-robbins\app\projects\[id]\page.tsx
+  44:6  warning  React Hook useEffect has a missing dependency: 'fetchProjectDetails'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\projects\mrs-robbins\app\voice-capture\page.tsx
+  17:23  warning  'setIsUploading' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+C:\projects\mrs-robbins\lib\error-logger.ts
+  11:15  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  72:10  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\projects\mrs-robbins\lib\services\cataloging.ts
+  438:13  warning  'queryEmbedding' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+C:\projects\mrs-robbins\lib\services\content-collection.ts
+  130:3   warning  'input' is defined but never used    @typescript-eslint/no-unused-vars
+  147:3   warning  'query' is defined but never used    @typescript-eslint/no-unused-vars
+  163:3   warning  'id' is defined but never used       @typescript-eslint/no-unused-vars
+  177:3   warning  'id' is defined but never used       @typescript-eslint/no-unused-vars
+  178:3   warning  'updates' is defined but never used  @typescript-eslint/no-unused-vars
+  190:37  warning  'id' is defined but never used       @typescript-eslint/no-unused-vars
+
+C:\projects\mrs-robbins\lib\services\context-manager.ts
+  179:3   warning  'request' is defined but never used            @typescript-eslint/no-unused-vars
+  197:3   warning  'input' is defined but never used              @typescript-eslint/no-unused-vars
+  214:3   warning  'id' is defined but never used                 @typescript-eslint/no-unused-vars
+  215:3   warning  'targetTemperature' is defined but never used  @typescript-eslint/no-unused-vars
+  230:3   warning  'id' is defined but never used                 @typescript-eslint/no-unused-vars
+  246:3   warning  'contextId' is defined but never used          @typescript-eslint/no-unused-vars
+  247:3   warning  'level' is defined but never used              @typescript-eslint/no-unused-vars
+  263:3   warning  'input' is defined but never used              @typescript-eslint/no-unused-vars
+  278:41  warning  'id' is defined but never used                 @typescript-eslint/no-unused-vars
+  290:3   warning  'userId' is defined but never used             @typescript-eslint/no-unused-vars
+  305:3   warning  'contexts' is defined but never used           @typescript-eslint/no-unused-vars
+  306:3   warning  'targetTokens' is defined but never used       @typescript-eslint/no-unused-vars
+
+C:\projects\mrs-robbins\lib\services\dialectical-editor.ts
+  236:3  warning  'input' is defined but never used        @typescript-eslint/no-unused-vars
+  253:3  warning  'input' is defined but never used        @typescript-eslint/no-unused-vars
+  270:3  warning  'request' is defined but never used      @typescript-eslint/no-unused-vars
+  287:3  warning  'sessionId' is defined but never used    @typescript-eslint/no-unused-vars
+  303:3  warning  'projectId' is defined but never used    @typescript-eslint/no-unused-vars
+  304:3  warning  'userId' is defined but never used       @typescript-eslint/no-unused-vars
+  321:3  warning  'sessionId' is defined but never used    @typescript-eslint/no-unused-vars
+  322:3  warning  'targetPhase' is defined but never used  @typescript-eslint/no-unused-vars
+  339:3  warning  'sessionId' is defined but never used    @typescript-eslint/no-unused-vars
+  340:3  warning  'format' is defined but never used       @typescript-eslint/no-unused-vars
+  362:3  warning  'sessionId' is defined but never used    @typescript-eslint/no-unused-vars
+  363:3  warning  'limit' is defined but never used        @typescript-eslint/no-unused-vars
+
+C:\projects\mrs-robbins\lib\services\embedding.ts
+  151:3   warning  'input' is defined but never used   @typescript-eslint/no-unused-vars
+  167:3   warning  'inputs' is defined but never used  @typescript-eslint/no-unused-vars
+  183:3   warning  'query' is defined but never used   @typescript-eslint/no-unused-vars
+  200:3   warning  'input' is defined but never used   @typescript-eslint/no-unused-vars
+  216:3   warning  'input' is defined but never used   @typescript-eslint/no-unused-vars
+  231:39  warning  'id' is defined but never used      @typescript-eslint/no-unused-vars
+
+C:\projects\mrs-robbins\lib\services\serendipity.ts
+  187:3  warning  'input' is defined but never used         @typescript-eslint/no-unused-vars
+  204:3  warning  'input' is defined but never used         @typescript-eslint/no-unused-vars
+  220:3  warning  'input' is defined but never used         @typescript-eslint/no-unused-vars
+  237:3  warning  'userId' is defined but never used        @typescript-eslint/no-unused-vars
+  254:3  warning  'connectionId' is defined but never used  @typescript-eslint/no-unused-vars
+  255:3  warning  'valuable' is defined but never used      @typescript-eslint/no-unused-vars
+  272:3  warning  'contentIds' is defined but never used    @typescript-eslint/no-unused-vars
+
+C:\projects\mrs-robbins\verify-db.js
+    8:26  error    A `require()` style import is forbidden              @typescript-eslint/no-require-imports
+   32:19  warning  'vocabData' is assigned a value but never used       @typescript-eslint/no-unused-vars
+   52:19  warning  'metadataData' is assigned a value but never used    @typescript-eslint/no-unused-vars
+  145:19  warning  'embeddingsData' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+✖ 60 problems (8 errors, 52 warnings)
+

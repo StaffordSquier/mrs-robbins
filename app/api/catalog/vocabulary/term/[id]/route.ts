@@ -19,7 +19,7 @@ export async function PUT(
 
     const supabase = createServiceClient();
 
-    const updateData: any = {};
+    const updateData: Record<string, string | string[] | null> = {};
     if (term !== undefined) updateData.term = term.trim();
     if (parentId !== undefined) updateData.parent_id = parentId;
     if (synonyms !== undefined) updateData.synonyms = synonyms;
